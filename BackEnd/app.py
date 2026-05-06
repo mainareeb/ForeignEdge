@@ -654,6 +654,135 @@ def clear_cache():
     _cache_invalidate(prefix)
     return jsonify({"message": f"Cache cleared: '{prefix}'"}), 200
 
+# ── Admin Routes ─────────────────────────────────────────────────────────────
+def verify_admin(request):
+    """Check admin key from header or JWT role"""
+    admin_key = os.getenv("ADMIN_KEY", "")
+    return request.headers.get("X-Admin-Key") == admin_key and admin_key != ""
+
+@app.route("/admin/users", methods=["GET"])
+@limiter.limit("20 per minute")
+def admin_get_users():
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        users_ref  = db.collection("users").stream()
+        users_list = []
+        for doc in users_ref:
+            u = doc.to_dict() or {}
+            users_list.append({
+                "email":      doc.id,
+                "name":       u.get("name", ""),
+                "created_at": u.get("created_at", ""),
+                "role":       u.get("role", "user"),
+            })
+        # Stats
+        today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        new_today = sum(1 for u in users_list if str(u.get("created_at","")).startswith(today))
+        return jsonify({
+            "users":      users_list,
+            "total":      len(users_list),
+            "new_today":  new_today,
+            "fetched_at": datetime.datetime.utcnow().isoformat() + "Z",
+        }), 200
+    except Exception as e:
+        logger.error("Admin users error: %s", e)
+        return jsonify({"error": "Failed to fetch users"}), 500
+
+@app.route("/admin/scholarships", methods=["GET"])
+@limiter.limit("20 per minute")
+def admin_get_scholarships():
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        docs = db.collection("scholarships").stream()
+        scholarships = []
+        for doc in docs:
+            s = doc.to_dict() or {}
+            s["id"] = doc.id
+            scholarships.append(s)
+        return jsonify({
+            "scholarships": scholarships,
+            "total":        len(scholarships),
+            "fetched_at":   datetime.datetime.utcnow().isoformat() + "Z",
+        }), 200
+    except Exception as e:
+        logger.error("Admin scholarships error: %s", e)
+        return jsonify({"error": "Failed to fetch scholarships"}), 500
+
+@app.route("/admin/scholarships", methods=["POST"])
+@limiter.limit("10 per minute")
+def admin_add_scholarship():
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        data = request.get_json(force=True)
+        required = ["name", "country", "amount", "deadline"]
+        for field in required:
+            if not data.get(field):
+                return jsonify({"error": f"Missing field: {field}"}), 400
+        data["created_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+        ref = db.collection("scholarships").add(data)
+        return jsonify({"message": "Scholarship added", "id": ref[1].id}), 201
+    except Exception as e:
+        logger.error("Admin add scholarship error: %s", e)
+        return jsonify({"error": "Failed to add scholarship"}), 500
+
+@app.route("/admin/scholarships/<scholarship_id>", methods=["PUT"])
+@limiter.limit("10 per minute")
+def admin_update_scholarship(scholarship_id):
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        data = request.get_json(force=True)
+        data["updated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+        db.collection("scholarships").document(scholarship_id).update(data)
+        return jsonify({"message": "Scholarship updated"}), 200
+    except Exception as e:
+        logger.error("Admin update scholarship error: %s", e)
+        return jsonify({"error": "Failed to update scholarship"}), 500
+
+@app.route("/admin/scholarships/<scholarship_id>", methods=["DELETE"])
+@limiter.limit("10 per minute")
+def admin_delete_scholarship(scholarship_id):
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        db.collection("scholarships").document(scholarship_id).delete()
+        return jsonify({"message": "Scholarship deleted"}), 200
+    except Exception as e:
+        logger.error("Admin delete scholarship error: %s", e)
+        return jsonify({"error": "Failed to delete scholarship"}), 500
+
+@app.route("/admin/stats", methods=["GET"])
+@limiter.limit("20 per minute")
+def admin_get_stats():
+    if not verify_admin(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        users_count        = len(list(db.collection("users").stream()))
+        scholarships_count = len(list(db.collection("scholarships").stream()))
+        # Count all trackers across users
+        tracker_count = 0
+        sop_count     = 0
+        reminder_count = 0
+        for user_doc in db.collection("users").stream():
+            tracker_count  += len(list(db.collection("users").document(user_doc.id).collection("applications").stream()))
+            sop_count      += len(list(db.collection("users").document(user_doc.id).collection("sops").stream()))
+            reminder_count += len(list(db.collection("users").document(user_doc.id).collection("reminders").stream()))
+
+        return jsonify({
+            "users":        users_count,
+            "scholarships": scholarships_count,
+            "applications": tracker_count,
+            "sops":         sop_count,
+            "reminders":    reminder_count,
+            "fetched_at":   datetime.datetime.utcnow().isoformat() + "Z",
+        }), 200
+    except Exception as e:
+        logger.error("Admin stats error: %s", e)
+        return jsonify({"error": "Failed to fetch stats"}), 500
+
 # ── Health ────────────────────────────────────────────────────────────────────
 @app.route("/health", methods=["GET"])
 def health():
