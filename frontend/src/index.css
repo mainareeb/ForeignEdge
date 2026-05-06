@@ -1,0 +1,402 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family:
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════
+   ForeignEdge — Global Animation System
+═══════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -700px 0;
+  }
+  100% {
+    background-position: 700px 0;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(74, 158, 218, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(74, 158, 218, 0.5);
+  }
+}
+@keyframes barFill {
+  from {
+    width: 0 !important;
+  }
+}
+@keyframes heroSlide {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Page wrapper ── */
+.fe-page {
+  animation: fadeIn 0.35s ease both;
+}
+
+/* ── Hero ── */
+.fe-hero-title {
+  animation: heroSlide 0.55s ease both;
+}
+.fe-hero-sub {
+  animation: heroSlide 0.65s ease 0.08s both;
+}
+.fe-hero-btn {
+  animation: heroSlide 0.65s ease 0.16s both;
+}
+
+/* ── Cards (staggered) ── */
+.fe-card {
+  animation: fadeInUp 0.45s ease both;
+}
+.fe-card-1 {
+  animation: fadeInUp 0.45s ease 0s both;
+}
+.fe-card-2 {
+  animation: fadeInUp 0.45s ease 0.08s both;
+}
+.fe-card-3 {
+  animation: fadeInUp 0.45s ease 0.16s both;
+}
+.fe-card-4 {
+  animation: fadeInUp 0.45s ease 0.24s both;
+}
+.fe-card-5 {
+  animation: fadeInUp 0.45s ease 0.32s both;
+}
+.fe-card-6 {
+  animation: fadeInUp 0.45s ease 0.4s both;
+}
+
+/* ── Stats (staggered) ── */
+.fe-stat-1 {
+  animation: fadeInUp 0.4s ease 0.05s both;
+}
+.fe-stat-2 {
+  animation: fadeInUp 0.4s ease 0.13s both;
+}
+.fe-stat-3 {
+  animation: fadeInUp 0.4s ease 0.21s both;
+}
+.fe-stat-4 {
+  animation: fadeInUp 0.4s ease 0.29s both;
+}
+.fe-stat-5 {
+  animation: fadeInUp 0.4s ease 0.37s both;
+}
+
+/* ── List items (staggered) ── */
+.fe-list-1 {
+  animation: fadeInUp 0.35s ease 0.04s both;
+}
+.fe-list-2 {
+  animation: fadeInUp 0.35s ease 0.08s both;
+}
+.fe-list-3 {
+  animation: fadeInUp 0.35s ease 0.12s both;
+}
+.fe-list-4 {
+  animation: fadeInUp 0.35s ease 0.16s both;
+}
+.fe-list-5 {
+  animation: fadeInUp 0.35s ease 0.2s both;
+}
+.fe-list-6 {
+  animation: fadeInUp 0.35s ease 0.24s both;
+}
+.fe-list-7 {
+  animation: fadeInUp 0.35s ease 0.28s both;
+}
+.fe-list-8 {
+  animation: fadeInUp 0.35s ease 0.32s both;
+}
+.fe-list-9 {
+  animation: fadeInUp 0.35s ease 0.36s both;
+}
+.fe-list-10 {
+  animation: fadeInUp 0.35s ease 0.4s both;
+}
+
+/* ── Sidebar ── */
+.fe-sidebar {
+  animation: fadeInLeft 0.45s ease both;
+}
+
+/* ── Form ── */
+.fe-form {
+  animation: scaleIn 0.38s ease both;
+}
+
+/* ── Navbar ── */
+.fe-nav {
+  animation: fadeInDown 0.4s ease both;
+}
+
+/* ── Empty state icon ── */
+.fe-empty-icon {
+  animation: bounceIn 0.55s ease both;
+}
+
+/* ── Floating icon ── */
+.fe-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ── Spinner ── */
+.fe-spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  vertical-align: middle;
+}
+.fe-spinner-dark {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(26, 46, 74, 0.15);
+  border-top-color: #1a2e4a;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  vertical-align: middle;
+}
+
+/* ── Skeleton loader ── */
+.fe-skeleton {
+  background: linear-gradient(90deg, #f0f4f8 25%, #dde6ef 50%, #f0f4f8 75%);
+  background-size: 700px 100%;
+  animation: shimmer 1.3s infinite;
+  border-radius: 8px;
+}
+
+/* ── Score bar fill ── */
+.fe-bar-fill {
+  animation: barFill 1.1s ease both;
+}
+
+/* ── Success message ── */
+.fe-success {
+  animation: bounceIn 0.4s ease both;
+}
+
+/* ── Step content ── */
+.fe-step {
+  animation: fadeInRight 0.32s ease both;
+}
+
+/* ── Tab content ── */
+.fe-tab-content {
+  animation: fadeIn 0.28s ease both;
+}
+
+/* ── Dropdown ── */
+.fe-dropdown {
+  animation: fadeInDown 0.2s ease both;
+}
+
+/* ── Hover: card lift ── */
+.fe-hoverable {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+.fe-hoverable:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.13) !important;
+  cursor: pointer;
+}
+
+/* ── Hover: button lift ── */
+.fe-btn-hover {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.fe-btn-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  opacity: 0.93;
+}
+
+/* ── Table row hover ── */
+.fe-table-row {
+  transition: background-color 0.15s ease;
+}
+.fe-table-row:hover {
+  background-color: #f0f7ff !important;
+}
+
+/* ── Input focus glow ── */
+.fe-input:focus {
+  border-color: #4a9eda !important;
+  box-shadow: 0 0 0 3px rgba(74, 158, 218, 0.14);
+  outline: none;
+}
+
+/* ── Navbar link hover ── */
+.fe-nav-link {
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+.fe-nav-link:hover {
+  opacity: 0.8;
+}
+
+/* ── Active glow (for selected tabs, active state) ── */
+.fe-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Badge pop ── */
+.fe-badge {
+  animation: scaleIn 0.28s ease both;
+}
+
+/* ── Smooth transitions on all interactive elements ── */
+button {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+  transform: translateY(0px);
+}
+a {
+  transition: opacity 0.15s ease;
+}
+input,
+select,
+textarea {
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #4a9eda !important;
+  box-shadow: 0 0 0 3px rgba(74, 158, 218, 0.13);
+  outline: none;
+}
