@@ -10,19 +10,6 @@ import { useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { getScholarships } from "../../services/api";
 
-const COUNTRIES = [
-  "All",
-  "UK",
-  "USA",
-  "Canada",
-  "Australia",
-  "Germany",
-  "Netherlands",
-  "Sweden",
-  "France",
-  "Pakistan",
-  "Various",
-];
 const FLAGS = {
   UK: "🇬🇧",
   USA: "🇺🇸",
@@ -42,7 +29,7 @@ const CSS = `
 @keyframes shimmer  { 0%{background-position:-400px 0}100%{background-position:400px 0} }
 .sch-card { animation:fadeInUp 0.4s ease both; transition:transform 0.25s,box-shadow 0.25s; }
 .sch-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.12)!important; }
-.skel { background:linear-gradient(90deg,#e8eef4 25%,#f4f7fa 50%,#e8eef4 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+.skel { background:linear-gradient(90deg,#f0faf2 25%,#f4f7fa 50%,#f0faf2 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
 .chip { transition:all 0.2s; cursor:pointer; }
 .chip:hover { transform:translateY(-2px); }
 `;
@@ -87,7 +74,7 @@ export default function Scholarships() {
   const [country, setCountry] = useState(urlCountry || "All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [sort, setSort] = useState("deadline");
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(71);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [input, setInput] = useState("");
@@ -138,14 +125,14 @@ export default function Scholarships() {
 
       <div
         style={{
-          background: "linear-gradient(135deg,#1a2e4a,#2a6496)",
+          background: "linear-gradient(135deg,#051F20,#163832)",
           padding: "50px 20px",
           textAlign: "center",
           color: "#fff",
         }}
       >
         <h1 style={{ fontSize: 34, fontWeight: 800, margin: 0 }}>
-          🏆 Scholarship Finder
+          Scholarship Finder
         </h1>
         <p
           style={{
@@ -181,7 +168,7 @@ export default function Scholarships() {
               minWidth: 220,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1.5px solid #d0dde8",
+              border: "1.5px solid #8EB69B",
               fontSize: 15,
               outline: "none",
             }}
@@ -192,7 +179,7 @@ export default function Scholarships() {
             style={{
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1.5px solid #d0dde8",
+              border: "1.5px solid #8EB69B",
               fontSize: 15,
               background: "#fff",
               cursor: "pointer",
@@ -208,7 +195,7 @@ export default function Scholarships() {
             style={{
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1.5px solid #d0dde8",
+              border: "1.5px solid #8EB69B",
               fontSize: 15,
               background: "#fff",
               cursor: "pointer",
@@ -217,37 +204,8 @@ export default function Scholarships() {
             <option value={10}>Show 10</option>
             <option value={20}>Show 20</option>
             <option value={50}>Show 50</option>
+            <option value={71}>Show All (71)</option>
           </select>
-        </div>
-
-        {/* Country chips */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            flexWrap: "wrap",
-            marginBottom: 10,
-          }}
-        >
-          {COUNTRIES.map((c) => (
-            <button
-              key={c}
-              className="chip"
-              onClick={() => setCountry(c)}
-              style={{
-                padding: "6px 14px",
-                borderRadius: 20,
-                border:
-                  country === c ? "2px solid #2a6496" : "1.5px solid #d0dde8",
-                background: country === c ? "#2a6496" : "#fff",
-                color: country === c ? "#fff" : "#444",
-                fontWeight: country === c ? 700 : 400,
-                fontSize: 13,
-              }}
-            >
-              {FLAGS[c] || "🌍"} {c}
-            </button>
-          ))}
         </div>
 
         {/* Type chips */}
@@ -270,7 +228,7 @@ export default function Scholarships() {
                 border:
                   typeFilter === t
                     ? "2px solid #16a34a"
-                    : "1.5px solid #d0dde8",
+                    : "1.5px solid #8EB69B",
                 background: typeFilter === t ? "#16a34a" : "#fff",
                 color: typeFilter === t ? "#fff" : "#444",
                 fontWeight: typeFilter === t ? 700 : 400,
@@ -278,10 +236,10 @@ export default function Scholarships() {
               }}
             >
               {t === "Full"
-                ? "🎯 Full Funding"
+                ? "Full Funding"
                 : t === "Partial"
-                  ? "📝 Partial"
-                  : "🌐 All Types"}
+                  ? "Partial"
+                  : "All Types"}
             </button>
           ))}
         </div>
@@ -313,7 +271,7 @@ export default function Scholarships() {
               onClick={fetchData}
               style={{
                 padding: "8px 20px",
-                background: "#2a6496",
+                background: "#163832",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -359,9 +317,9 @@ export default function Scholarships() {
               style={{
                 padding: "8px 18px",
                 borderRadius: 8,
-                border: "1.5px solid #d0dde8",
+                border: "1.5px solid #8EB69B",
                 background: page === 1 ? "#f5f5f5" : "#fff",
-                color: page === 1 ? "#bbb" : "#2a6496",
+                color: page === 1 ? "#bbb" : "#163832",
                 fontWeight: 600,
                 cursor: page === 1 ? "not-allowed" : "pointer",
                 fontSize: 14,
@@ -385,8 +343,8 @@ export default function Scholarships() {
                     height: 38,
                     borderRadius: 8,
                     border: "1.5px solid",
-                    borderColor: p === page ? "#2a6496" : "#d0dde8",
-                    background: p === page ? "#2a6496" : "#fff",
+                    borderColor: p === page ? "#163832" : "#8EB69B",
+                    background: p === page ? "#163832" : "#fff",
                     color: p === page ? "#fff" : "#444",
                     fontWeight: p === page ? 700 : 400,
                     cursor: "pointer",
@@ -404,9 +362,9 @@ export default function Scholarships() {
               style={{
                 padding: "8px 18px",
                 borderRadius: 8,
-                border: "1.5px solid #d0dde8",
+                border: "1.5px solid #8EB69B",
                 background: page === pages ? "#f5f5f5" : "#fff",
-                color: page === pages ? "#bbb" : "#2a6496",
+                color: page === pages ? "#bbb" : "#163832",
                 fontWeight: 600,
                 cursor: page === pages ? "not-allowed" : "pointer",
                 fontSize: 14,
@@ -454,11 +412,12 @@ export default function Scholarships() {
                     gap: 10,
                     borderTop:
                       sch.type?.toLowerCase() === "full"
-                        ? "3px solid #2a6496"
-                        : "3px solid #d0dde8",
+                        ? "3px solid #163832"
+                        : "3px solid #8EB69B",
                     animationDelay: `${i * 0.04}s`,
                   }}
                 >
+                  {/* ── Header ── */}
                   <div
                     style={{
                       display: "flex",
@@ -468,9 +427,9 @@ export default function Scholarships() {
                   >
                     <h3
                       style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: "#1a2e4a",
+                        fontSize: 16,
+                        fontWeight: 800,
+                        color: "#051F20",
                         margin: 0,
                         flex: 1,
                         lineHeight: 1.3,
@@ -478,75 +437,327 @@ export default function Scholarships() {
                     >
                       {sch.name}
                     </h3>
-                    {sch.type?.toLowerCase() === "full" && (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        flexShrink: 0,
+                        marginLeft: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {sch.type?.toLowerCase() === "full" && (
+                        <span
+                          style={{
+                            background: "#163832",
+                            color: "#fff",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: 10,
+                          }}
+                        >
+                          FULL FUNDING
+                        </span>
+                      )}
+                      {sch.type?.toLowerCase() === "partial" && (
+                        <span
+                          style={{
+                            background: "#DAF1DE",
+                            color: "#163832",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: 10,
+                          }}
+                        >
+                          PARTIAL
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Key Info Row ── */}
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <span
+                      style={{
+                        background: "#f0faf2",
+                        padding: "4px 10px",
+                        borderRadius: 20,
+                        fontSize: 12,
+                        color: "#444",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {FLAGS[sch.country] || "🌍"} {sch.country}
+                    </span>
+                    {sch.amount && (
                       <span
                         style={{
-                          background: "#2a6496",
-                          color: "#fff",
-                          fontSize: 10,
-                          fontWeight: 700,
-                          padding: "3px 8px",
-                          borderRadius: 10,
-                          marginLeft: 8,
-                          flexShrink: 0,
+                          background: "#e8fdf0",
+                          padding: "4px 10px",
+                          borderRadius: 20,
+                          fontSize: 12,
+                          color: "#163832",
+                          fontWeight: 600,
                         }}
                       >
-                        FULL
+                        {sch.amount}
+                      </span>
+                    )}
+                    {sch.deadline && (
+                      <span
+                        style={{
+                          background: "#fff8e6",
+                          padding: "4px 10px",
+                          borderRadius: 20,
+                          fontSize: 12,
+                          color: "#b07d00",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {sch.deadline}
+                      </span>
+                    )}
+                    {sch.field && (
+                      <span
+                        style={{
+                          background: "#DAF1DE",
+                          padding: "4px 10px",
+                          borderRadius: 20,
+                          fontSize: 12,
+                          color: "#235347",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {sch.field}
                       </span>
                     )}
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 14,
-                      fontSize: 13,
-                      color: "#555",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <span>
-                      {FLAGS[sch.country] || "🌍"} {sch.country}
-                    </span>
-                    <span>💰 {sch.amount}</span>
-                    {sch.deadline && <span>📅 {sch.deadline}</span>}
-                  </div>
-
-                  {sch.field && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        background: "#e8f4fd",
-                        color: "#1a6ca8",
-                        fontSize: 12,
-                        fontWeight: 600,
-                        padding: "3px 10px",
-                        borderRadius: 10,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      🎯 {sch.field}
-                    </span>
-                  )}
-
+                  {/* ── Description ── */}
                   {sch.description && (
                     <p
                       style={{
                         fontSize: 13,
                         color: "#555",
                         margin: 0,
-                        lineHeight: 1.55,
+                        lineHeight: 1.6,
                       }}
                     >
-                      {sch.description.length > 130
-                        ? sch.description.slice(0, 130) + "…"
+                      {sch.description.length > 150
+                        ? sch.description.slice(0, 150) + "…"
                         : sch.description}
                     </p>
                   )}
 
+                  {/* ── Details Grid ── */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                      background: "#f0faf2",
+                      borderRadius: 10,
+                      padding: 12,
+                    }}
+                  >
+                    {sch.coverage && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Coverage
+                        </p>
+                        <p style={{ fontSize: 12, color: "#333", margin: 0 }}>
+                          {sch.coverage}
+                        </p>
+                      </div>
+                    )}
+                    {sch.duration && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Duration
+                        </p>
+                        <p style={{ fontSize: 12, color: "#333", margin: 0 }}>
+                          {sch.duration}
+                        </p>
+                      </div>
+                    )}
+                    {sch.gpa_requirement && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Min GPA
+                        </p>
+                        <p style={{ fontSize: 12, color: "#333", margin: 0 }}>
+                          {sch.gpa_requirement}
+                        </p>
+                      </div>
+                    )}
+                    {sch.ielts_requirement && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Min IELTS
+                        </p>
+                        <p style={{ fontSize: 12, color: "#333", margin: 0 }}>
+                          {sch.ielts_requirement}
+                        </p>
+                      </div>
+                    )}
+                    {sch.age_limit && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Age Limit
+                        </p>
+                        <p style={{ fontSize: 12, color: "#333", margin: 0 }}>
+                          {sch.age_limit}
+                        </p>
+                      </div>
+                    )}
+                    {sch.success_rate && (
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "#888",
+                            margin: "0 0 2px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Success Rate
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 12,
+                            color: "#27ae60",
+                            margin: 0,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {sch.success_rate}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── Eligibility ── */}
                   {sch.eligibility && (
-                    <p style={{ fontSize: 12, color: "#777", margin: 0 }}>
-                      <strong>Eligibility:</strong> {sch.eligibility}
+                    <div
+                      style={{
+                        background: "#f0faf2",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#888",
+                          margin: "0 0 4px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Eligibility
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: "#444",
+                          margin: 0,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {sch.eligibility}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ── Required Documents ── */}
+                  {sch.documents && sch.documents.length > 0 && (
+                    <div>
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#888",
+                          margin: "0 0 6px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Required Documents
+                      </p>
+                      <div
+                        style={{ display: "flex", gap: 6, flexWrap: "wrap" }}
+                      >
+                        {sch.documents.map((doc, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              background: "#fff3cd",
+                              color: "#856404",
+                              fontSize: 11,
+                              padding: "2px 8px",
+                              borderRadius: 10,
+                              fontWeight: 600,
+                            }}
+                          >
+                            {doc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {sch.bond_required && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#dc2626",
+                        margin: 0,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Bond/Return Service Required: {sch.bond_required}
                     </p>
                   )}
 
@@ -559,7 +770,7 @@ export default function Scholarships() {
                         style={{
                           display: "block",
                           padding: "10px 14px",
-                          background: "#2a6496",
+                          background: "#163832",
                           color: "#fff",
                           borderRadius: 9,
                           textDecoration: "none",
@@ -583,7 +794,7 @@ export default function Scholarships() {
                         paddingTop: 8,
                       }}
                     >
-                      📡 {sch.source}
+                      {sch.source}
                     </p>
                   )}
                 </div>

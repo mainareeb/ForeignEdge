@@ -2,17 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import API from "../../services/api";
+import emailjs from "@emailjs/browser";
+
+// EmailJS config from .env
+const EMAILJS_SERVICE = process.env.REACT_APP_EMAILJS_SERVICE_ID || "";
+const EMAILJS_TEMPLATE = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || "";
+const EMAILJS_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || "";
 
 const CATEGORY_CONFIG = {
   Application: {
-    color: "#e8f4fd",
-    text: "#1a6fa8",
-    border: "#90caef",
+    color: "#DAF1DE",
+    text: "#163832",
+    border: "#8EB69B",
     emoji: "🎓",
   },
   Scholarship: {
     color: "#e6f4ea",
-    text: "#2d7a3a",
+    text: "#163832",
     border: "#7dcf8a",
     emoji: "💰",
   },
@@ -23,10 +29,36 @@ const CATEGORY_CONFIG = {
     border: "#c9a8f5",
     emoji: "📄",
   },
-  Other: { color: "#f0f4f8", text: "#5a7a96", border: "#c8dae8", emoji: "📌" },
+  Other: { color: "#f0f4f8", text: "#235347", border: "#DAF1DE", emoji: "📌" },
 };
 
 const CATEGORIES = Object.keys(CATEGORY_CONFIG);
+
+async function sendReminderEmail(reminder, userEmail, userName) {
+  if (!EMAILJS_SERVICE || !EMAILJS_TEMPLATE || !EMAILJS_KEY) {
+    console.warn("EmailJS not configured");
+    return false;
+  }
+  try {
+    await emailjs.send(
+      EMAILJS_SERVICE,
+      EMAILJS_TEMPLATE,
+      {
+        to_email: userEmail,
+        to_name: userName || "Student",
+        scholarship_name: reminder.title || reminder.name || "Scholarship",
+        deadline: reminder.deadline || "N/A",
+        country: reminder.country || "N/A",
+        notes: reminder.notes || "No notes",
+      },
+      EMAILJS_KEY,
+    );
+    return true;
+  } catch (err) {
+    console.error("EmailJS error:", err);
+    return false;
+  }
+}
 
 function getUrgency(deadline) {
   const today = new Date();
@@ -73,7 +105,7 @@ function getUrgency(deadline) {
   return {
     label: `${diff}d left`,
     color: "#e6f4ea",
-    text: "#2d7a3a",
+    text: "#163832",
     border: "#7dcf8a",
     emoji: "🟢",
     days: diff,
@@ -89,6 +121,30 @@ function DeadlineReminders() {
   const [editingId, setEditingId] = useState(null);
   const [filterCategory, setFilterCategory] = useState("All");
   const [successMsg, setSuccessMsg] = useState("");
+  const [emailSending, setEmailSending] = useState(null);
+  const [emailSent, setEmailSent] = useState({});
+
+  const handleSendEmail = async (reminder) => {
+    const userEmail =
+      JSON.parse(localStorage.getItem("user") || "{}").email || "";
+    const userName =
+      JSON.parse(localStorage.getItem("user") || "{}").name || "";
+    if (!userEmail) {
+      setSuccessMsg("Could not find your email. Please login again.");
+      return;
+    }
+    setEmailSending(reminder.id);
+    const success = await sendReminderEmail(reminder, userEmail, userName);
+    setEmailSending(null);
+    if (success) {
+      setEmailSent((prev) => ({ ...prev, [reminder.id]: true }));
+      setSuccessMsg("✅ Reminder email sent to " + userEmail + "!");
+      setTimeout(() => setSuccessMsg(""), 4000);
+    } else {
+      setSuccessMsg("❌ Failed to send email. Check EmailJS config.");
+      setTimeout(() => setSuccessMsg(""), 4000);
+    }
+  };
   const [formData, setFormData] = useState({
     title: "",
     category: "Application",
@@ -245,13 +301,13 @@ function DeadlineReminders() {
             <span style={styles.statLabel}>🟠 This Week</span>
           </div>
           <div style={{ ...styles.statCard, borderLeft: "4px solid #27ae60" }}>
-            <span style={{ ...styles.statNumber, color: "#2d7a3a" }}>
+            <span style={{ ...styles.statNumber, color: "#163832" }}>
               {upcoming}
             </span>
             <span style={styles.statLabel}>🟢 Upcoming</span>
           </div>
-          <div style={{ ...styles.statCard, borderLeft: "4px solid #4a9eda" }}>
-            <span style={{ ...styles.statNumber, color: "#1a2e4a" }}>
+          <div style={{ ...styles.statCard, borderLeft: "4px solid #8EB69B" }}>
+            <span style={{ ...styles.statNumber, color: "#051F20" }}>
               {reminders.length}
             </span>
             <span style={styles.statLabel}>📌 Total</span>
@@ -447,6 +503,24 @@ function DeadlineReminders() {
                       ✏️ Edit
                     </button>
                     <button
+                      onClick={() => handleSendEmail(r)}
+                      disabled={emailSending === r.id}
+                      style={{
+                        ...styles.editBtn,
+                        background: emailSent[r.id] ? "#DAF1DE" : "#fff8e6",
+                        color: emailSent[r.id] ? "#27ae60" : "#b07d00",
+                        border: emailSent[r.id]
+                          ? "1px solid #27ae60"
+                          : "1px solid #ffd166",
+                      }}
+                    >
+                      {emailSending === r.id
+                        ? "Sending..."
+                        : emailSent[r.id]
+                          ? "✅ Sent"
+                          : "📧 Email Me"}
+                    </button>
+                    <button
                       onClick={() => handleDelete(r.id)}
                       style={styles.deleteBtn}
                     >
@@ -481,9 +555,9 @@ const styles = {
     alignItems: "center",
     height: "80vh",
   },
-  loadingText: { fontSize: "18px", color: "#1a2e4a" },
+  loadingText: { fontSize: "18px", color: "#051F20" },
   hero: {
-    background: "linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%)",
+    background: "linear-gradient(135deg, #051F20 0%, #051F20 100%)",
     padding: "35px 40px",
   },
   heroContent: {
@@ -501,9 +575,9 @@ const styles = {
     color: "#ffffff",
     margin: "0 0 6px",
   },
-  heroSubtitle: { fontSize: "15px", color: "#b0c4d8", margin: 0 },
+  heroSubtitle: { fontSize: "15px", color: "#8EB69B", margin: 0 },
   addBtn: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     color: "#ffffff",
     border: "none",
     padding: "14px 28px",
@@ -516,7 +590,7 @@ const styles = {
   successMsg: {
     backgroundColor: "#e6f4ea",
     border: "1px solid #b7dfb8",
-    color: "#2d7a3a",
+    color: "#163832",
     padding: "14px 20px",
     borderRadius: "10px",
     marginBottom: "20px",
@@ -541,7 +615,7 @@ const styles = {
     display: "block",
     fontSize: "28px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
   },
   statLabel: {
     display: "block",
@@ -560,7 +634,7 @@ const styles = {
   formTitle: {
     fontSize: "18px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "20px",
   },
   twoCol: {
@@ -573,7 +647,7 @@ const styles = {
   label: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#1a2e4a",
+    color: "#051F20",
     display: "block",
     marginBottom: "8px",
   },
@@ -613,7 +687,7 @@ const styles = {
   formBtns: { display: "flex", gap: "15px", justifyContent: "flex-end" },
   cancelBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 25px",
     borderRadius: "10px",
@@ -622,7 +696,7 @@ const styles = {
     fontWeight: "600",
   },
   saveBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "12px 28px",
@@ -658,9 +732,9 @@ const styles = {
     fontWeight: "500",
   },
   filterActive: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
-    border: "1.5px solid #1a2e4a",
+    border: "1.5px solid #051F20",
     padding: "8px 16px",
     borderRadius: "20px",
     cursor: "pointer",
@@ -698,7 +772,7 @@ const styles = {
   cardTitle: {
     fontSize: "16px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: 0,
   },
   catBadge: {
@@ -737,8 +811,8 @@ const styles = {
     borderTop: "1px solid #f0f4f8",
   },
   editBtn: {
-    backgroundColor: "#e8f4fd",
-    color: "#1a6fa8",
+    backgroundColor: "#DAF1DE",
+    color: "#163832",
     border: "none",
     padding: "8px 18px",
     borderRadius: "8px",
@@ -768,14 +842,14 @@ const styles = {
   emptyTitle: {
     fontSize: "20px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 8px",
   },
   emptySubtitle: { fontSize: "15px", color: "#888", margin: "0 0 24px" },
   backRow: { marginBottom: "40px" },
   backBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 25px",
     borderRadius: "10px",

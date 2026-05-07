@@ -5,6 +5,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const menuRef = useRef(null);
+  const translateRef = useRef(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -23,15 +24,31 @@ function Navbar() {
 
   useEffect(() => {
     const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (menuRef.current && !menuRef.current.contains(e.target))
         setMenuOpen(false);
-      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   useEffect(() => setMenuOpen(false), [location.pathname]);
+
+  // Move Google Translate widget into navbar
+  useEffect(() => {
+    let tries = 0;
+    const move = () => {
+      const src = document.getElementById("google_translate_element");
+      const tgt = translateRef.current;
+      if (src && tgt && src.querySelector("select")) {
+        tgt.appendChild(src);
+        src.style.display = "block";
+      } else if (tries < 40) {
+        tries++;
+        setTimeout(move, 250);
+      }
+    };
+    setTimeout(move, 500);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -48,12 +65,6 @@ function Navbar() {
 
   const HAMBURGER_ITEMS = [
     {
-      to: "/recommendations",
-      icon: "🤖",
-      title: "AI Recommendations",
-      desc: "ML-powered personalized picks",
-    },
-    {
       to: "/compare",
       icon: "⚖️",
       title: "Compare",
@@ -64,6 +75,12 @@ function Navbar() {
       icon: "💬",
       title: "AI Chat",
       desc: "Ask our AI assistant",
+    },
+    {
+      to: "/recommendations",
+      icon: "🤖",
+      title: "AI Recommendations",
+      desc: "ML-powered personalized picks",
     },
     {
       to: "/accommodation",
@@ -99,8 +116,31 @@ function Navbar() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .nav-link:hover      { color: #fff !important; }
-        .dropdown-item:hover { background: #f0f7ff !important; }
+        .dropdown-item:hover { background: #DAF1DE !important; }
         .hamburger-btn:hover { background: rgba(255,255,255,0.18) !important; }
+
+        /* Hide Google branding */
+        .goog-te-gadget > span,
+        .goog-te-gadget a,
+        .goog-te-gadget img { display: none !important; }
+        .goog-te-gadget { font-size: 0 !important; }
+        #google_translate_element select {
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          color: #DAF1DE !important;
+          background: rgba(255,255,255,0.1) !important;
+          border: 1.5px solid rgba(142,182,155,0.5) !important;
+          border-radius: 8px !important;
+          padding: 6px 10px !important;
+          cursor: pointer !important;
+          outline: none !important;
+        }
+        #google_translate_element select option {
+          color: #051F20 !important;
+          background: #fff !important;
+        }
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
       `}</style>
 
       <nav style={S.nav}>
@@ -125,6 +165,12 @@ function Navbar() {
             </Link>
           ))}
 
+          {/* 🌐 Google Translate */}
+          <div
+            ref={translateRef}
+            style={{ display: "flex", alignItems: "center" }}
+          />
+
           {isLoggedIn ? (
             <>
               <Link
@@ -133,17 +179,16 @@ function Navbar() {
               >
                 Dashboard
               </Link>
-
               {userName && (
                 <Link to="/profile" style={S.profileBtn}>
                   👤 {userName}
                 </Link>
               )}
-
               <button onClick={handleLogout} style={S.logoutBtn}>
                 Logout
               </button>
 
+              {/* Hamburger */}
               <div style={S.hamburgerWrapper} ref={menuRef}>
                 <button
                   className="hamburger-btn"
@@ -161,7 +206,6 @@ function Navbar() {
                     style={{ ...S.bar, ...(menuOpen ? S.barBotOpen : {}) }}
                   />
                 </button>
-
                 {menuOpen && (
                   <div style={S.dropdown}>
                     <p style={S.dropdownLabel}>Tools</p>
@@ -185,7 +229,7 @@ function Navbar() {
                           <span
                             style={{
                               marginLeft: "auto",
-                              color: "#4a9eda",
+                              color: "#8EB69B",
                               fontSize: 18,
                             }}
                           >
@@ -220,7 +264,7 @@ const S = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "15px 40px",
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
     position: "sticky",
     top: 0,
@@ -229,7 +273,7 @@ const S = {
     gap: "10px",
   },
   logoText: {
-    color: "#4a9eda",
+    color: "#8EB69B",
     fontSize: "24px",
     fontWeight: "bold",
     textDecoration: "none",
@@ -250,19 +294,19 @@ const S = {
     transition: "color 0.2s",
   },
   linkActive: {
-    color: "#4a9eda",
+    color: "#8EB69B",
     textDecoration: "none",
     fontSize: "15px",
     fontWeight: "700",
-    borderBottom: "2px solid #4a9eda",
+    borderBottom: "2px solid #8EB69B",
     paddingBottom: "2px",
   },
   dashBtn: {
-    color: "#4a9eda",
+    color: "#8EB69B",
     textDecoration: "none",
     fontSize: "14px",
     fontWeight: "600",
-    border: "1px solid #4a9eda",
+    border: "1px solid #8EB69B",
     padding: "7px 16px",
     borderRadius: "6px",
   },
@@ -271,7 +315,7 @@ const S = {
     textDecoration: "none",
     fontSize: "14px",
     fontWeight: "600",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#235347",
     padding: "7px 16px",
     borderRadius: "6px",
   },
@@ -294,16 +338,16 @@ const S = {
     cursor: "pointer",
   },
   loginBtn: {
-    color: "#4a9eda",
+    color: "#8EB69B",
     textDecoration: "none",
     fontSize: "15px",
     fontWeight: "600",
-    border: "1px solid #4a9eda",
+    border: "1px solid #8EB69B",
     padding: "7px 18px",
     borderRadius: "6px",
   },
   registerBtn: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#235347",
     color: "#fff",
     textDecoration: "none",
     fontSize: "15px",
@@ -342,19 +386,19 @@ const S = {
     position: "absolute",
     top: "52px",
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#f0faf2",
     borderRadius: "16px",
-    boxShadow: "0 12px 40px rgba(0,0,0,0.18)",
+    boxShadow: "0 12px 40px rgba(5,31,32,0.2)",
     padding: "12px",
     minWidth: "270px",
     zIndex: 2000,
-    border: "1px solid #e0e9f0",
+    border: "1px solid #8EB69B",
     animation: "dropIn 0.2s ease",
   },
   dropdownLabel: {
     fontSize: "11px",
     fontWeight: "700",
-    color: "#bbb",
+    color: "#235347",
     textTransform: "uppercase",
     letterSpacing: "1px",
     margin: "0 0 8px 10px",
@@ -370,12 +414,12 @@ const S = {
     cursor: "pointer",
     marginBottom: "4px",
   },
-  dropdownItemActive: { backgroundColor: "#f0f7ff" },
+  dropdownItemActive: { backgroundColor: "#DAF1DE", borderRadius: "10px" },
   dropdownIcon: {
     fontSize: "20px",
     width: "40px",
     height: "40px",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#DAF1DE",
     borderRadius: "10px",
     display: "flex",
     alignItems: "center",
@@ -387,14 +431,10 @@ const S = {
   dropdownItemTitle: {
     fontSize: "14px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: 0,
   },
-  dropdownItemDesc: {
-    fontSize: "12px",
-    color: "#888",
-    margin: "2px 0 0",
-  },
+  dropdownItemDesc: { fontSize: "12px", color: "#888", margin: "2px 0 0" },
 };
 
 export default Navbar;

@@ -6,99 +6,99 @@ import Navbar from "../../components/Navbar";
 // Inject global CSS animations once
 const animationCSS = `
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to   { opacity: 1; transform: translateY(0); }
+ from { opacity: 0; transform: translateY(40px); }
+ to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-40px); }
-  to   { opacity: 1; transform: translateX(0); }
+ from { opacity: 0; transform: translateX(-40px); }
+ to { opacity: 1; transform: translateX(0); }
 }
 @keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
+ from { opacity: 0; transform: translateX(40px); }
+ to { opacity: 1; transform: translateX(0); }
 }
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-18px); }
+ 0%, 100% { transform: translateY(0px); }
+ 50% { transform: translateY(-18px); }
 }
 @keyframes floatSlow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50%       { transform: translateY(-10px) rotate(3deg); }
+ 0%, 100% { transform: translateY(0px) rotate(0deg); }
+ 50% { transform: translateY(-10px) rotate(3deg); }
 }
 @keyframes slideShow {
-  0%   { opacity: 0; transform: scale(1.08); }
-  8%   { opacity: 1; transform: scale(1); }
-  30%  { opacity: 1; transform: scale(1); }
-  38%  { opacity: 0; transform: scale(0.96); }
-  100% { opacity: 0; transform: scale(0.96); }
+ 0% { opacity: 0; transform: scale(1.08); }
+ 8% { opacity: 1; transform: scale(1); }
+ 30% { opacity: 1; transform: scale(1); }
+ 38% { opacity: 0; transform: scale(0.96); }
+ 100% { opacity: 0; transform: scale(0.96); }
 }
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.05); }
+ 0%, 100% { transform: scale(1); }
+ 50% { transform: scale(1.05); }
 }
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+ 0% { background-position: -200% center; }
+ 100% { background-position: 200% center; }
 }
 @keyframes countUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
 }
 @keyframes rotateSlow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+ from { transform: rotate(0deg); }
+ to { transform: rotate(360deg); }
 }
 @keyframes borderGlow {
-  0%, 100% { box-shadow: 0 0 10px rgba(74,158,218,0.3); }
-  50%       { box-shadow: 0 0 25px rgba(74,158,218,0.7); }
+ 0%, 100% { box-shadow: 0 0 10px rgba(74,158,218,0.3); }
+ 50% { box-shadow: 0 0 25px rgba(74,158,218,0.7); }
 }
 .hero-img-0 { animation: slideShow 12s infinite 0s; }
 .hero-img-1 { animation: slideShow 12s infinite 4s; }
 .hero-img-2 { animation: slideShow 12s infinite 8s; }
-.animate-float     { animation: float 4s ease-in-out infinite; }
+.animate-float { animation: float 4s ease-in-out infinite; }
 .animate-floatSlow { animation: floatSlow 6s ease-in-out infinite; }
-.animate-pulse     { animation: pulse 2s ease-in-out infinite; }
-.animate-glow      { animation: borderGlow 2.5s ease-in-out infinite; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-glow { animation: borderGlow 2.5s ease-in-out infinite; }
 .btn-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+ transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 .btn-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+ transform: translateY(-3px);
+ box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 .card-hover {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+ transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 35px rgba(0,0,0,0.12) !important;
+ transform: translateY(-6px);
+ box-shadow: 0 12px 35px rgba(0,0,0,0.12) !important;
 }
 .fade-in-up {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+ opacity: 0;
+ transform: translateY(40px);
+ transition: opacity 0.7s ease, transform 0.7s ease;
 }
 .fade-in-up.visible {
-  opacity: 1;
-  transform: translateY(0);
+ opacity: 1;
+ transform: translateY(0);
 }
 .fade-in-left {
-  opacity: 0;
-  transform: translateX(-40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+ opacity: 0;
+ transform: translateX(-40px);
+ transition: opacity 0.7s ease, transform 0.7s ease;
 }
 .fade-in-left.visible {
-  opacity: 1;
-  transform: translateX(0);
+ opacity: 1;
+ transform: translateX(0);
 }
 .fade-in-right {
-  opacity: 0;
-  transform: translateX(40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+ opacity: 0;
+ transform: translateX(40px);
+ transition: opacity 0.7s ease, transform 0.7s ease;
 }
 .fade-in-right.visible {
-  opacity: 1;
-  transform: translateX(0);
+ opacity: 1;
+ transform: translateX(0);
 }
 `;
 
@@ -156,6 +156,9 @@ function Home() {
     countries: "…",
   });
   const [destCounts, setDestCounts] = useState({});
+  const [news, setNews] = useState([]);
+  const [newsTab, setNewsTab] = useState("scholarships");
+  const [newsLoading, setNewsLoading] = useState(false);
 
   const fetchLiveStats = useCallback(async () => {
     try {
@@ -172,13 +175,16 @@ function Home() {
         scholarships: platStats?.scholarships
           ? String(platStats.scholarships)
           : "70",
-        countries: platStats?.countries ? String(platStats.countries) : "7",
+        // Real-time: countries count from scholarships in Firestore
+        countries: platStats?.countries
+          ? String(platStats.countries) + "+"
+          : "41+",
       });
     } catch {
       setLiveStats({
         universities: "500+",
         scholarships: "70",
-        countries: "7",
+        countries: "41+",
       });
     }
   }, []);
@@ -203,71 +209,83 @@ function Home() {
     fetchDestCounts();
   }, [fetchLiveStats, fetchDestCounts]);
 
+  // Fetch news on tab change
+  useEffect(() => {
+    setNewsLoading(true);
+    fetch(process.env.REACT_APP_API_URL + "/news?topic=" + newsTab)
+      .then((r) => r.json())
+      .then((data) => {
+        setNews(data.articles || []);
+        setNewsLoading(false);
+      })
+      .catch(() => setNewsLoading(false));
+  }, [newsTab]);
+
   const stats = [
     {
       value: liveStats.universities,
       label: "Universities Listed",
-      icon: "🎓",
+      icon: "",
       note: "via HiPolabs API",
     },
     {
       value: liveStats.scholarships,
       label: "Verified Scholarships",
-      icon: "💰",
+      icon: "",
       note: "from official sources",
     },
     {
       value: liveStats.countries,
       label: "Countries Covered",
-      icon: "🌍",
+      icon: "",
       note: "with full visa & cost data",
     },
     {
       value: "Free",
       label: "Always Free to Use",
-      icon: "🚀",
+      icon: "",
       note: "no subscriptions",
     },
   ];
 
   const features = [
     {
-      icon: "🎓",
+      icon: "",
       title: "University Recommendations",
       desc: "AI-powered recommendations based on your academic profile, GPA, and preferences.",
-      color: "#e8f4fd",
-      accent: "#4a9eda",
+      color: "#DAF1DE",
+      accent: "#8EB69B",
     },
     {
-      icon: "💰",
+      icon: "",
       title: "Scholarship Search",
       desc: "Find fully funded and partial scholarships that match your background and needs.",
       color: "#e8fdf0",
-      accent: "#2d7a3a",
+      accent: "#163832",
     },
     {
-      icon: "📋",
+      icon: "",
       title: "Visa Guidance",
       desc: "Step-by-step visa process guidance for UK, USA, Canada, Germany and Australia.",
       color: "#fdf8e8",
       accent: "#b8860b",
     },
     {
-      icon: "🤖",
+      icon: "",
       title: "AI Chatbot",
       desc: "Get instant answers to all your study abroad questions 24/7.",
       color: "#fde8f4",
       accent: "#9b2d7a",
     },
     {
-      icon: "🔐",
+      icon: "",
       title: "Secure Platform",
       desc: "Your data is protected with AES-256 encryption and JWT authentication.",
-      color: "#f0e8fd",
-      accent: "#6b3fa0",
+      color: "#DAF1DE",
+      accent: "#163832",
     },
     {
-      icon: "🌍",
+      icon: "",
       title: "Global Network",
       desc: "Connect with students and universities from over 50 countries worldwide.",
       color: "#fde8e8",
@@ -280,19 +298,19 @@ function Home() {
       step: "01",
       title: "Create Account",
       desc: "Sign up for free and complete your academic profile.",
-      icon: "✍️",
+      icon: "️",
     },
     {
       step: "02",
       title: "Get Recommendations",
       desc: "Our AI analyzes your profile and suggests best-fit universities.",
-      icon: "🤖",
+      icon: "",
     },
     {
       step: "03",
       title: "Apply & Succeed",
       desc: "Apply to universities and track your applications in one place.",
-      icon: "🏆",
+      icon: "",
     },
   ];
 
@@ -387,7 +405,7 @@ function Home() {
         <div style={styles.heroContent}>
           <div style={{ animation: "fadeInUp 0.8s ease both" }}>
             <div style={styles.heroBadge} className="animate-pulse">
-              🌟 #1 Study Abroad Platform for Pakistani Students
+              #1 Study Abroad Platform for Pakistani Students
             </div>
           </div>
           <h1 style={styles.heroTitle} className="animate-float">
@@ -451,7 +469,7 @@ function Home() {
           </div>
 
           {/* Current slide caption */}
-          <p style={styles.slideCaption}>📍 {heroImages[heroIndex].caption}</p>
+          <p style={styles.slideCaption}>{heroImages[heroIndex].caption}</p>
         </div>
 
         {/* Stats Row */}
@@ -476,7 +494,7 @@ function Home() {
       <div style={styles.section}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle} className="fade-in-up">
-            🌍 Popular Study Destinations
+            Popular Study Destinations
           </h2>
           <p style={styles.sectionSubtitle} className="fade-in-up">
             Top countries chosen by Pakistani students
@@ -633,6 +651,173 @@ function Home() {
         </div>
       </div>
 
+      {/* ── LATEST NEWS ── */}
+      <div style={{ background: "#f0faf2", padding: "60px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <h2
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              color: "#051F20",
+              textAlign: "center",
+              marginBottom: 8,
+            }}
+          >
+            Latest News
+          </h2>
+          <p style={{ textAlign: "center", color: "#666", marginBottom: 28 }}>
+            Stay updated with scholarships, universities and study abroad news
+          </p>
+
+          {/* Topic tabs */}
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              justifyContent: "center",
+              marginBottom: 28,
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              "scholarships",
+              "universities",
+              "study abroad",
+              "accommodation",
+              "visa",
+            ].map((t) => (
+              <button
+                key={t}
+                onClick={() => setNewsTab(t)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 20,
+                  border: "none",
+                  background: newsTab === t ? "#051F20" : "#fff",
+                  color: newsTab === t ? "#fff" : "#444",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+                  textTransform: "capitalize",
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {/* News cards */}
+          {newsLoading ? (
+            <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
+              Loading news...
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: 20,
+              }}
+            >
+              {news.slice(0, 6).map((article, i) => (
+                <a
+                  key={i}
+                  href={article.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ textDecoration: "none" }}
+                >
+                  <div
+                    style={{
+                      background: "#fff",
+                      borderRadius: 14,
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+                      height: "100%",
+                    }}
+                  >
+                    {article.image && (
+                      <img
+                        src={article.image}
+                        alt=""
+                        style={{
+                          width: "100%",
+                          height: 160,
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
+                    )}
+                    <div style={{ padding: "16px" }}>
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#235347",
+                          fontWeight: 700,
+                          margin: "0 0 6px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {article.source}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: "#051F20",
+                          margin: "0 0 8px",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {article.title ? article.title.slice(0, 80) : ""}
+                        {article.title && article.title.length > 80
+                          ? "..."
+                          : ""}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: "#888",
+                          margin: 0,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {article.description
+                          ? article.description.slice(0, 100)
+                          : ""}
+                        {article.description && article.description.length > 100
+                          ? "..."
+                          : ""}
+                      </p>
+                      <p style={{ fontSize: 11, color: "#bbb", marginTop: 10 }}>
+                        {article.published_at
+                          ? new Date(article.published_at).toLocaleDateString()
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+              {news.length === 0 && !newsLoading && (
+                <div
+                  style={{
+                    gridColumn: "1/-1",
+                    textAlign: "center",
+                    color: "#aaa",
+                    padding: 40,
+                  }}
+                >
+                  No news found. Make sure NEWS_API_KEY is set in .env
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ── FOOTER ── */}
       <div style={styles.footer}>
         <div style={styles.footerContent}>
@@ -659,7 +844,7 @@ function Home() {
           </div>
         </div>
         <p style={styles.footerCopy}>
-          © 2026 ForeignEdge. All rights reserved. | Built with ❤️ for Pakistani
+          © 2026 ForeignEdge. All rights reserved. | Built with ️ for Pakistani
           Students
         </p>
       </div>
@@ -670,7 +855,7 @@ function Home() {
 const styles = {
   container: {
     fontFamily: "'Segoe UI', sans-serif",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     overflowX: "hidden",
   },
 
@@ -694,7 +879,7 @@ const styles = {
     position: "absolute",
     inset: 0,
     background:
-      "linear-gradient(135deg, rgba(15,31,53,0.88) 0%, rgba(26,46,74,0.75) 60%, rgba(30,58,95,0.5) 100%)",
+      "linear-gradient(135deg, rgba(5,31,32,0.88) 0%, rgba(11,43,38,0.78) 60%, rgba(22,56,50,0.55) 100%)",
   },
   heroContent: {
     position: "relative",
@@ -706,14 +891,14 @@ const styles = {
   },
   heroBadge: {
     display: "inline-block",
-    backgroundColor: "rgba(74,158,218,0.25)",
-    color: "#4a9eda",
+    backgroundColor: "rgba(142,182,155,0.2)",
+    color: "#DAF1DE",
     padding: "8px 20px",
     borderRadius: "20px",
     fontSize: "14px",
     fontWeight: "600",
     marginBottom: "25px",
-    border: "1px solid rgba(74,158,218,0.4)",
+    border: "1px solid rgba(142,182,155,0.5)",
   },
   heroTitle: {
     fontSize: "64px",
@@ -723,10 +908,10 @@ const styles = {
     lineHeight: "1.15",
     textShadow: "0 4px 20px rgba(0,0,0,0.3)",
   },
-  heroHighlight: { color: "#4a9eda", display: "inline-block" },
+  heroHighlight: { color: "#8EB69B", display: "inline-block" },
   heroSubtitle: {
     fontSize: "18px",
-    color: "#c5d8eb",
+    color: "#DAF1DE",
     maxWidth: "600px",
     margin: "0 auto 40px",
     lineHeight: "1.7",
@@ -738,14 +923,14 @@ const styles = {
     flexWrap: "wrap",
   },
   primaryBtn: {
-    backgroundColor: "#4a9eda",
-    color: "#fff",
+    backgroundColor: "#235347",
+    color: "#DAF1DE",
     padding: "16px 35px",
     borderRadius: "50px",
     textDecoration: "none",
     fontSize: "16px",
     fontWeight: "700",
-    boxShadow: "0 6px 20px rgba(74,158,218,0.5)",
+    boxShadow: "0 6px 20px rgba(35,83,71,0.6)",
   },
   secondaryBtn: {
     backgroundColor: "transparent",
@@ -772,7 +957,7 @@ const styles = {
     cursor: "pointer",
     transition: "all 0.3s ease",
   },
-  dotActive: { backgroundColor: "#4a9eda", transform: "scale(1.3)" },
+  dotActive: { backgroundColor: "#8EB69B", transform: "scale(1.3)" },
   slideCaption: {
     fontSize: "13px",
     color: "rgba(255,255,255,0.6)",
@@ -784,7 +969,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     borderTop: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(0,0,0,0.3)",
+    background: "rgba(5,31,32,0.6)",
     backdropFilter: "blur(10px)",
   },
   statItem: {
@@ -797,18 +982,23 @@ const styles = {
   statValue: {
     fontSize: "32px",
     fontWeight: "800",
-    color: "#4a9eda",
+    color: "#DAF1DE",
     margin: "0 0 4px",
   },
-  statLabel: { fontSize: "13px", color: "#b0c4d8", margin: 0 },
+  statLabel: { fontSize: "13px", color: "#8EB69B", margin: 0 },
 
   // Sections
-  section: { padding: "80px 40px", maxWidth: "1200px", margin: "0 auto" },
+  section: {
+    padding: "80px 40px",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#f0faf2",
+  },
   sectionHeader: { textAlign: "center", marginBottom: "50px" },
   sectionTitle: {
     fontSize: "36px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "12px",
   },
   sectionSubtitle: { fontSize: "16px", color: "#666" },
@@ -823,8 +1013,9 @@ const styles = {
     borderRadius: "16px",
     overflow: "hidden",
     textDecoration: "none",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 20px rgba(5,31,32,0.15)",
     display: "block",
+    border: "1px solid #8EB69B",
   },
   destinationImgWrapper: { position: "relative", height: "180px" },
   destinationImg: {
@@ -845,16 +1036,16 @@ const styles = {
     fontSize: "28px",
     filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
   },
-  destinationInfo: { backgroundColor: "#ffffff", padding: "16px 20px" },
+  destinationInfo: { backgroundColor: "#DAF1DE", padding: "16px 20px" },
   destinationName: {
     fontSize: "16px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 4px",
   },
   destinationUnis: {
     fontSize: "13px",
-    color: "#4a9eda",
+    color: "#163832",
     fontWeight: "600",
     margin: 0,
   },
@@ -880,7 +1071,7 @@ const styles = {
   },
 
   // How it works
-  howSection: { backgroundColor: "#1a2e4a", padding: "80px 40px" },
+  howSection: { backgroundColor: "#051F20", padding: "80px 40px" },
   sectionTitleWhite: {
     fontSize: "36px",
     fontWeight: "800",
@@ -890,7 +1081,7 @@ const styles = {
   },
   sectionSubtitleWhite: {
     fontSize: "16px",
-    color: "#b0c4d8",
+    color: "#8EB69B",
     textAlign: "center",
     marginBottom: "50px",
   },
@@ -911,7 +1102,7 @@ const styles = {
   stepNumber: {
     width: "64px",
     height: "64px",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -923,7 +1114,7 @@ const styles = {
   stepBadge: {
     display: "inline-block",
     backgroundColor: "rgba(255,255,255,0.1)",
-    color: "#4a9eda",
+    color: "#8EB69B",
     fontSize: "12px",
     fontWeight: "800",
     padding: "3px 10px",
@@ -937,13 +1128,13 @@ const styles = {
     color: "#ffffff",
     marginBottom: "10px",
   },
-  stepDesc: { fontSize: "14px", color: "#b0c4d8", lineHeight: "1.6" },
+  stepDesc: { fontSize: "14px", color: "#8EB69B", lineHeight: "1.6" },
   stepArrow: {
     position: "absolute",
     right: "-15px",
     top: "30px",
     fontSize: "28px",
-    color: "#4a9eda",
+    color: "#8EB69B",
     fontWeight: "bold",
   },
 
@@ -962,7 +1153,7 @@ const styles = {
   },
   quoteIcon: {
     fontSize: "60px",
-    color: "#4a9eda",
+    color: "#8EB69B",
     opacity: 0.2,
     position: "absolute",
     top: "10px",
@@ -985,19 +1176,19 @@ const styles = {
     height: "48px",
     borderRadius: "50%",
     objectFit: "cover",
-    border: "3px solid #4a9eda",
+    border: "3px solid #8EB69B",
   },
   testimonialName: {
     fontSize: "15px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: 0,
   },
   testimonialUniversity: { fontSize: "13px", color: "#666", margin: 0 },
 
   // CTA
   ctaSection: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     padding: "80px 40px",
     textAlign: "center",
     position: "relative",
@@ -1018,7 +1209,7 @@ const styles = {
   },
   ctaSubtitle: {
     fontSize: "16px",
-    color: "#e0f0ff",
+    color: "#DAF1DE",
     marginBottom: "35px",
     maxWidth: "600px",
     margin: "0 auto 35px",
@@ -1033,7 +1224,7 @@ const styles = {
   },
   ctaPrimaryBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     padding: "16px 35px",
     borderRadius: "50px",
     textDecoration: "none",
@@ -1052,7 +1243,7 @@ const styles = {
   },
 
   // Footer
-  footer: { backgroundColor: "#0f1f35", padding: "40px" },
+  footer: { backgroundColor: "#051F20", padding: "40px" },
   footerContent: {
     display: "flex",
     justifyContent: "space-between",
@@ -1063,12 +1254,12 @@ const styles = {
   footerLogo: {
     fontSize: "22px",
     fontWeight: "800",
-    color: "#4a9eda",
+    color: "#8EB69B",
     margin: "0 0 5px",
   },
-  footerTagline: { fontSize: "13px", color: "#b0c4d8", margin: 0 },
+  footerTagline: { fontSize: "13px", color: "#8EB69B", margin: 0 },
   footerLinks: { display: "flex", gap: "25px" },
-  footerLink: { color: "#b0c4d8", textDecoration: "none", fontSize: "14px" },
+  footerLink: { color: "#8EB69B", textDecoration: "none", fontSize: "14px" },
   footerCopy: {
     textAlign: "center",
     color: "#666",

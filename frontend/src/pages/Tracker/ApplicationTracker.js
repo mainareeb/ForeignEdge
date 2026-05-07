@@ -1,3 +1,4 @@
+import { SkeletonList } from "../../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
@@ -5,9 +6,9 @@ import API from "../../services/api";
 
 const STATUS_CONFIG = {
   Planning: {
-    color: "#f0f4f8",
-    text: "#5a7a96",
-    border: "#c8dae8",
+    color: "#f0faf2",
+    text: "#235347",
+    border: "#DAF1DE",
     emoji: "📋",
   },
   "In Progress": {
@@ -17,14 +18,14 @@ const STATUS_CONFIG = {
     emoji: "✏️",
   },
   Submitted: {
-    color: "#e8f4fd",
-    text: "#1a6fa8",
-    border: "#90caef",
+    color: "#DAF1DE",
+    text: "#163832",
+    border: "#8EB69B",
     emoji: "📤",
   },
   Accepted: {
     color: "#e6f4ea",
-    text: "#2d7a3a",
+    text: "#163832",
     border: "#7dcf8a",
     emoji: "✅",
   },
@@ -186,7 +187,7 @@ function ApplicationTracker() {
       <div style={styles.container} className="fe-page">
         <Navbar />
         <div style={styles.centered}>
-          <p style={styles.loadingText}>⏳ Loading tracker...</p>
+          <SkeletonList rows={4} />
         </div>
       </div>
     );
@@ -200,7 +201,7 @@ function ApplicationTracker() {
       <div style={styles.hero}>
         <div style={styles.heroContent}>
           <div>
-            <h1 style={styles.heroTitle}>📋 Application Tracker</h1>
+            <h1 style={styles.heroTitle}>Application Tracker</h1>
             <p style={styles.heroSubtitle}>
               Track all your university applications in one place
             </p>
@@ -262,7 +263,7 @@ function ApplicationTracker() {
         {showForm && (
           <div style={styles.formCard} className="fe-form">
             <h3 style={styles.formTitle}>
-              {editingId ? "✏️ Edit Application" : "➕ Add New Application"}
+              {editingId ? "Edit Application" : "Add New Application"}
             </h3>
 
             <div style={styles.twoCol}>
@@ -379,8 +380,8 @@ function ApplicationTracker() {
                 {saving
                   ? "⏳ Saving..."
                   : editingId
-                    ? "💾 Update"
-                    : "➕ Add Application"}
+                    ? "Update"
+                    : "Add Application"}
               </button>
             </div>
           </div>
@@ -409,7 +410,7 @@ function ApplicationTracker() {
         {/* Applications List */}
         {filtered.length === 0 ? (
           <div style={styles.emptyBox}>
-            <p style={styles.emptyEmoji}>📭</p>
+            <p style={styles.emptyEmoji}></p>
             <p style={styles.emptyTitle}>No applications yet</p>
             <p style={styles.emptySubtitle}>
               Click "Add Application" to start tracking
@@ -495,7 +496,7 @@ function ApplicationTracker() {
                         rel="noreferrer"
                         style={styles.portalLink}
                       >
-                        🔗 Open Portal
+                        Open Portal
                       </a>
                     )}
                   </div>
@@ -535,7 +536,7 @@ function ApplicationTracker() {
 const styles = {
   container: {
     fontFamily: "Segoe UI, sans-serif",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     minHeight: "100vh",
   },
   centered: {
@@ -544,9 +545,9 @@ const styles = {
     alignItems: "center",
     height: "80vh",
   },
-  loadingText: { fontSize: "18px", color: "#1a2e4a" },
+  loadingText: { fontSize: "18px", color: "#051F20" },
   hero: {
-    background: "linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%)",
+    background: "linear-gradient(135deg, #051F20 0%, #051F20 100%)",
     padding: "35px 40px",
   },
   heroContent: {
@@ -564,9 +565,9 @@ const styles = {
     color: "#ffffff",
     margin: "0 0 6px",
   },
-  heroSubtitle: { fontSize: "15px", color: "#b0c4d8", margin: 0 },
+  heroSubtitle: { fontSize: "15px", color: "#8EB69B", margin: 0 },
   addBtn: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     color: "#ffffff",
     border: "none",
     padding: "14px 28px",
@@ -579,7 +580,7 @@ const styles = {
   successMsg: {
     backgroundColor: "#e6f4ea",
     border: "1px solid #b7dfb8",
-    color: "#2d7a3a",
+    color: "#163832",
     padding: "14px 20px",
     borderRadius: "10px",
     marginBottom: "20px",
@@ -605,7 +606,7 @@ const styles = {
     display: "block",
     fontSize: "28px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
   },
   statLabel: {
     display: "block",
@@ -624,7 +625,7 @@ const styles = {
   formTitle: {
     fontSize: "18px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "20px",
   },
   twoCol: {
@@ -637,7 +638,7 @@ const styles = {
   label: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#1a2e4a",
+    color: "#051F20",
     display: "block",
     marginBottom: "8px",
   },
@@ -649,7 +650,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
   },
   select: {
     width: "100%",
@@ -659,7 +660,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     cursor: "pointer",
   },
   textarea: {
@@ -670,14 +671,14 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     resize: "vertical",
     fontFamily: "Segoe UI, sans-serif",
   },
   formBtns: { display: "flex", gap: "15px", justifyContent: "flex-end" },
   cancelBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 25px",
     borderRadius: "10px",
@@ -686,7 +687,7 @@ const styles = {
     fontWeight: "600",
   },
   saveBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "12px 28px",
@@ -722,9 +723,9 @@ const styles = {
     fontWeight: "500",
   },
   filterActive: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
-    border: "1.5px solid #1a2e4a",
+    border: "1.5px solid #051F20",
     padding: "8px 16px",
     borderRadius: "20px",
     cursor: "pointer",
@@ -760,7 +761,7 @@ const styles = {
   appUniversity: {
     fontSize: "17px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 4px",
   },
   appProgram: { fontSize: "14px", color: "#666", margin: 0 },
@@ -783,14 +784,14 @@ const styles = {
   metaTag: { fontSize: "13px", fontWeight: "500" },
   portalLink: {
     fontSize: "13px",
-    color: "#1a6fa8",
+    color: "#163832",
     fontWeight: "600",
     textDecoration: "none",
   },
   appNotes: {
     fontSize: "13px",
     color: "#777",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     padding: "10px 14px",
     borderRadius: "8px",
     margin: "10px 0 0",
@@ -804,8 +805,8 @@ const styles = {
     borderTop: "1px solid #f0f4f8",
   },
   editBtn: {
-    backgroundColor: "#e8f4fd",
-    color: "#1a6fa8",
+    backgroundColor: "#DAF1DE",
+    color: "#163832",
     border: "none",
     padding: "8px 18px",
     borderRadius: "8px",
@@ -835,14 +836,14 @@ const styles = {
   emptyTitle: {
     fontSize: "20px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 8px",
   },
   emptySubtitle: { fontSize: "15px", color: "#888", margin: "0 0 24px" },
   backRow: { marginBottom: "40px" },
   backBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 25px",
     borderRadius: "10px",

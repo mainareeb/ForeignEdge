@@ -34,7 +34,7 @@ const CSS = `
 .chat-msg { animation: fadeInUp 0.3s ease both; }
 .dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: #4a9eda; display: inline-block; margin: 0 2px;
+  background: #8EB69B; display: inline-block; margin: 0 2px;
   animation: bounce 1.2s ease-in-out infinite;
 }
 .dot:nth-child(2) { animation-delay: 0.15s; }
@@ -57,7 +57,7 @@ function TypingIndicator() {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          background: "linear-gradient(135deg,#1a2e4a,#4a9eda)",
+          background: "linear-gradient(135deg,#051F20,#8EB69B)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -186,7 +186,7 @@ export default function Chatbot() {
         {/* Header */}
         <div
           style={{
-            background: "linear-gradient(135deg,#1a2e4a,#2a6496)",
+            background: "linear-gradient(135deg,#051F20,#163832)",
             borderRadius: "14px 14px 0 0",
             padding: "18px 22px",
             display: "flex",
@@ -279,21 +279,21 @@ export default function Chatbot() {
                     disabled={loading}
                     style={{
                       background: "#fff",
-                      border: "1.5px solid #d0dde8",
+                      border: "1.5px solid #8EB69B",
                       borderRadius: 20,
                       padding: "6px 14px",
                       fontSize: 13,
-                      color: "#1a2e4a",
+                      color: "#051F20",
                       cursor: "pointer",
                       transition: "all 0.2s",
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.background = "#1a2e4a";
+                      e.target.style.background = "#051F20";
                       e.target.style.color = "#fff";
                     }}
                     onMouseOut={(e) => {
                       e.target.style.background = "#fff";
-                      e.target.style.color = "#1a2e4a";
+                      e.target.style.color = "#051F20";
                     }}
                   >
                     {q}
@@ -322,7 +322,7 @@ export default function Chatbot() {
                     height: 36,
                     borderRadius: "50%",
                     flexShrink: 0,
-                    background: "linear-gradient(135deg,#1a2e4a,#4a9eda)",
+                    background: "linear-gradient(135deg,#051F20,#8EB69B)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -337,7 +337,7 @@ export default function Chatbot() {
                   style={{
                     background:
                       msg.role === "user"
-                        ? "#1a2e4a"
+                        ? "#051F20"
                         : msg.isError
                           ? "#fef2f2"
                           : "#fff",
@@ -346,7 +346,7 @@ export default function Chatbot() {
                         ? "#fff"
                         : msg.isError
                           ? "#dc2626"
-                          : "#1a1a2e",
+                          : "#051F20",
                     border:
                       msg.role === "user"
                         ? "none"
@@ -439,7 +439,7 @@ export default function Chatbot() {
               style={{
                 width: "100%",
                 padding: "10px 14px",
-                border: "1.5px solid #d0dde8",
+                border: "1.5px solid #8EB69B",
                 borderRadius: 10,
                 fontSize: 14,
                 resize: "none",
@@ -466,7 +466,7 @@ export default function Chatbot() {
             onClick={() => sendMessage()}
             disabled={loading || !input.trim()}
             style={{
-              background: loading || !input.trim() ? "#c8d8e8" : "#1a2e4a",
+              background: loading || !input.trim() ? "#DAF1DE" : "#051F20",
               color: "#fff",
               border: "none",
               borderRadius: 10,

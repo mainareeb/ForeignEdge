@@ -33,7 +33,7 @@ const COUNTRIES = {
     climate: "Mild & Rainy",
     currency: "GBP (£)",
     scholarships: ["Chevening", "Commonwealth", "Gates Cambridge"],
-    color: "#1a3a8f",
+    color: "#163832",
   },
   "United States": {
     flag: "🇺🇸",
@@ -212,7 +212,7 @@ const COUNTRIES = {
     climate: "Cold, long winters",
     currency: "SEK (kr)",
     scholarships: ["SISGP", "Erasmus+", "SIDA"],
-    color: "#006aa7",
+    color: "#163832",
   },
   France: {
     flag: "🇫🇷",
@@ -887,7 +887,7 @@ function CountryComparison() {
                         style={{
                           fontSize: 10,
                           background: "#e6f4ea",
-                          color: "#2d7a3a",
+                          color: "#163832",
                           padding: "2px 6px",
                           borderRadius: 4,
                           fontWeight: 600,
@@ -935,7 +935,7 @@ function CountryComparison() {
                 style={{
                   ...styles.tableRow,
                   gridTemplateColumns: gridCols,
-                  backgroundColor: "#f0f7ff",
+                  backgroundColor: "#f0faf2",
                   alignItems: "flex-start",
                 }}
               >
@@ -1046,14 +1046,14 @@ const styles = {
   },
   hero: {
     background:
-      "linear-gradient(135deg, #0a1628 0%, #1a2e4a 60%, #1e3d5c 100%)",
+      "linear-gradient(135deg, #051F20 0%, #051F20 60%, #0B2B26 100%)",
     padding: "60px 40px",
   },
   heroInner: { maxWidth: "700px", margin: "0 auto", textAlign: "center" },
   heroEyebrow: {
     fontSize: "13px",
     fontWeight: "700",
-    color: "#4a9eda",
+    color: "#8EB69B",
     textTransform: "uppercase",
     letterSpacing: "2px",
     margin: "0 0 12px",
@@ -1067,7 +1067,7 @@ const styles = {
   },
   heroSubtitle: {
     fontSize: "16px",
-    color: "#8fb3cc",
+    color: "#8EB69B",
     margin: 0,
     lineHeight: "1.7",
   },
@@ -1089,7 +1089,7 @@ const styles = {
   searchCardTitle: {
     fontSize: "17px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 3px",
   },
   searchCardSub: { fontSize: "13px", color: "#888", margin: 0 },
@@ -1103,7 +1103,7 @@ const styles = {
     display: "block",
     fontSize: "13px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "8px",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
@@ -1125,7 +1125,7 @@ const styles = {
     outline: "none",
     fontSize: "14px",
     backgroundColor: "transparent",
-    color: "#1a2e4a",
+    color: "#051F20",
   },
   clearBtn: {
     background: "none",
@@ -1155,7 +1155,7 @@ const styles = {
     padding: "11px 16px",
     cursor: "pointer",
     fontSize: "14px",
-    color: "#1a2e4a",
+    color: "#051F20",
     transition: "background 0.15s",
   },
   dropdownFlag: { fontSize: "18px" },
@@ -1172,7 +1172,7 @@ const styles = {
   emptyTitle: {
     fontSize: "19px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 10px",
   },
   emptySub: {
@@ -1189,7 +1189,7 @@ const styles = {
     overflow: "hidden",
     marginBottom: "30px",
   },
-  tableHeader: { display: "grid", borderBottom: "2px solid #e8f0f8" },
+  tableHeader: { display: "grid", borderBottom: "2px solid #f0faf2" },
   thLabel: {
     padding: "20px 22px",
     backgroundColor: "#f8fafc",
@@ -1219,7 +1219,7 @@ const styles = {
     borderRight: "1px solid #f0f4f8",
   },
   rowIcon: { fontSize: "16px", flexShrink: 0 },
-  rowText: { fontSize: "13px", fontWeight: "600", color: "#1a2e4a" },
+  rowText: { fontSize: "13px", fontWeight: "600", color: "#051F20" },
   rowCell: {
     padding: "14px 18px",
     display: "flex",
@@ -1259,7 +1259,7 @@ const styles = {
   backRow: { marginBottom: "40px" },
   backBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 28px",
     borderRadius: "10px",

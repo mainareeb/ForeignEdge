@@ -19,8 +19,42 @@ const COUNTRIES = [
   "Germany",
   "Netherlands",
   "Sweden",
+  "France",
   "Japan",
+  "South Korea",
+  "China",
+  "Turkey",
+  "Malaysia",
+  "Singapore",
+  "New Zealand",
+  "Switzerland",
+  "Finland",
+  "Norway",
+  "Ireland",
+  "Italy",
+  "Denmark",
+  "Austria",
+  "Belgium",
+  "Portugal",
+  "Spain",
+  "Czech Republic",
+  "Poland",
+  "Hungary",
+  "Greece",
+  "Romania",
+  "Slovakia",
+  "Croatia",
+  "Slovenia",
+  "Estonia",
+  "Latvia",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Cyprus",
+  "Iceland",
+  "Liechtenstein",
 ];
+
 const FLAGS = {
   UK: "🇬🇧",
   USA: "🇺🇸",
@@ -29,14 +63,47 @@ const FLAGS = {
   Germany: "🇩🇪",
   Netherlands: "🇳🇱",
   Sweden: "🇸🇪",
+  France: "🇫🇷",
   Japan: "🇯🇵",
+  "South Korea": "🇰🇷",
+  China: "🇨🇳",
+  Turkey: "🇹🇷",
+  Malaysia: "🇲🇾",
+  Singapore: "🇸🇬",
+  "New Zealand": "🇳🇿",
+  Switzerland: "🇨🇭",
+  Finland: "🇫🇮",
+  Norway: "🇳🇴",
+  Ireland: "🇮🇪",
+  Italy: "🇮🇹",
+  Denmark: "🇩🇰",
+  Austria: "🇦🇹",
+  Belgium: "🇧🇪",
+  Portugal: "🇵🇹",
+  Spain: "🇪🇸",
+  "Czech Republic": "🇨🇿",
+  Poland: "🇵🇱",
+  Hungary: "🇭🇺",
+  Greece: "🇬🇷",
+  Romania: "🇷🇴",
+  Slovakia: "🇸🇰",
+  Croatia: "🇭🇷",
+  Slovenia: "🇸🇮",
+  Estonia: "🇪🇪",
+  Latvia: "🇱🇻",
+  Lithuania: "🇱🇹",
+  Luxembourg: "🇱🇺",
+  Malta: "🇲🇹",
+  Cyprus: "🇨🇾",
+  Iceland: "🇮🇸",
+  Liechtenstein: "🇱🇮",
 };
 
 const CSS = `
 @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
 @keyframes shimmer  { 0%{background-position:-400px 0}100%{background-position:400px 0} }
 .vis-card { animation:fadeInUp 0.4s ease both; }
-.skel { background:linear-gradient(90deg,#e8eef4 25%,#f4f7fa 50%,#e8eef4 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+.skel { background:linear-gradient(90deg,#f0faf2 25%,#f4f7fa 50%,#f0faf2 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
 .ctry-btn { transition:all 0.2s; cursor:pointer; }
 .ctry-btn:hover { transform:translateY(-2px); }
 `;
@@ -45,6 +112,7 @@ export default function Visa() {
   const [searchParams] = useSearchParams();
   const urlCountry = searchParams.get("country");
 
+  const [searchQuery, setSearchQuery] = useState("");
   const [selected, setSelected] = useState(
     COUNTRIES.includes(urlCountry) ? urlCountry : "UK",
   );
@@ -75,8 +143,6 @@ export default function Visa() {
     fetchVisa();
   }, [fetchVisa]);
 
-  const color = visa?.color || "#2a6496";
-
   return (
     <>
       <style>{CSS}</style>
@@ -84,15 +150,13 @@ export default function Visa() {
 
       <div
         style={{
-          background: "linear-gradient(135deg,#1a2e4a,#2a6496)",
+          background: "linear-gradient(135deg,#051F20,#163832)",
           padding: "50px 20px",
           textAlign: "center",
           color: "#fff",
         }}
       >
-        <h1 style={{ fontSize: 34, fontWeight: 800, margin: 0 }}>
-          📋 Visa Guide
-        </h1>
+        <h1 style={{ fontSize: 34, fontWeight: 800, margin: 0 }}>Visa Guide</h1>
         <p
           style={{
             opacity: 0.85,
@@ -108,34 +172,96 @@ export default function Visa() {
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 20px" }}>
-        {/* Country selector */}
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            flexWrap: "wrap",
-            marginBottom: 28,
-          }}
-        >
-          {COUNTRIES.map((c) => (
-            <button
-              key={c}
-              className="ctry-btn"
-              onClick={() => setSelected(c)}
+        {/* Country search bar */}
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ position: "relative", maxWidth: 500 }}>
+            <span
               style={{
-                padding: "10px 20px",
-                borderRadius: 24,
-                border:
-                  selected === c ? `2px solid #2a6496` : "1.5px solid #d0dde8",
-                background: selected === c ? "#2a6496" : "#fff",
-                color: selected === c ? "#fff" : "#444",
-                fontWeight: selected === c ? 700 : 400,
-                fontSize: 14,
+                position: "absolute",
+                left: 14,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: 18,
               }}
             >
-              {FLAGS[c]} {c}
-            </button>
-          ))}
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="Search country (e.g. Germany, UK, Canada...)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px 14px 12px 44px",
+                borderRadius: 12,
+                border: "1.5px solid #8EB69B",
+                fontSize: 15,
+                outline: "none",
+                boxSizing: "border-box",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+            />
+          </div>
+
+          {/* Search results dropdown */}
+          {searchQuery && (
+            <div
+              style={{
+                background: "#fff",
+                border: "1.5px solid #8EB69B",
+                borderRadius: 12,
+                marginTop: 8,
+                maxHeight: 280,
+                overflowY: "auto",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                maxWidth: 500,
+              }}
+            >
+              {COUNTRIES.filter((c) =>
+                c.toLowerCase().includes(searchQuery.toLowerCase()),
+              ).length === 0 ? (
+                <p style={{ padding: "12px 16px", color: "#888", margin: 0 }}>
+                  No country found
+                </p>
+              ) : (
+                COUNTRIES.filter((c) =>
+                  c.toLowerCase().includes(searchQuery.toLowerCase()),
+                ).map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setSelected(c);
+                      setSearchQuery("");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      width: "100%",
+                      padding: "10px 16px",
+                      background: selected === c ? "#DAF1DE" : "#fff",
+                      border: "none",
+                      borderBottom: "1px solid #f0f0f0",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      textAlign: "left",
+                      fontWeight: selected === c ? 700 : 400,
+                      color: selected === c ? "#163832" : "#333",
+                    }}
+                  >
+                    <span style={{ fontSize: 20 }}>{FLAGS[c] || "🌍"}</span>
+                    {c}
+                    {selected === c && (
+                      <span style={{ marginLeft: "auto", color: "#163832" }}>
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Error */}
@@ -163,7 +289,7 @@ export default function Visa() {
               style={{
                 marginTop: 10,
                 padding: "8px 20px",
-                background: "#2a6496",
+                background: "#163832",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -221,7 +347,7 @@ export default function Visa() {
             {/* Source badge */}
             <div
               style={{
-                background: "#f0f9ff",
+                background: "#f0faf2",
                 border: "1px solid #bae6fd",
                 borderRadius: 10,
                 padding: "12px 16px",
@@ -235,7 +361,7 @@ export default function Visa() {
               }}
             >
               <span>
-                📡 <strong>Source:</strong> {visa.source}
+                <strong>Source:</strong> {visa.source}
               </span>
               {visa.is_live && (
                 <span
@@ -248,7 +374,7 @@ export default function Visa() {
                     fontWeight: 700,
                   }}
                 >
-                  🟢 LIVE
+                  LIVE
                 </span>
               )}
               {visa.official_link && (
@@ -296,7 +422,7 @@ export default function Visa() {
                     borderRadius: 12,
                     padding: "16px 18px",
                     boxShadow: "0 2px 10px rgba(0,0,0,0.07)",
-                    borderTop: `3px solid #2a6496`,
+                    borderTop: `3px solid #163832`,
                     animationDelay: `${i * 0.06}s`,
                   }}
                 >
@@ -318,7 +444,7 @@ export default function Visa() {
                     style={{
                       fontSize: 14,
                       fontWeight: 700,
-                      color: "#1a2e4a",
+                      color: "#051F20",
                       marginTop: 4,
                     }}
                   >
@@ -349,11 +475,11 @@ export default function Visa() {
                   style={{
                     fontSize: 17,
                     fontWeight: 700,
-                    color: "#1a2e4a",
+                    color: "#051F20",
                     margin: "0 0 14px",
                   }}
                 >
-                  📋 Requirements
+                  Requirements
                 </h2>
                 <ul style={{ margin: 0, padding: "0 0 0 18px" }}>
                   {(visa.requirements || []).map((r, i) => (
@@ -375,7 +501,7 @@ export default function Visa() {
               {/* Tips */}
               <div
                 style={{
-                  background: "#f0f9ff",
+                  background: "#f0faf2",
                   borderRadius: 14,
                   padding: 22,
                   boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
@@ -385,11 +511,11 @@ export default function Visa() {
                   style={{
                     fontSize: 17,
                     fontWeight: 700,
-                    color: "#1a2e4a",
+                    color: "#051F20",
                     margin: "0 0 14px",
                   }}
                 >
-                  💡 Tips for Pakistani Applicants
+                  Tips for Pakistani Applicants
                 </h2>
                 <ul style={{ margin: 0, padding: "0 0 0 18px" }}>
                   {(visa.tips || []).map((t, i) => (
@@ -424,11 +550,11 @@ export default function Visa() {
                   style={{
                     fontSize: 17,
                     fontWeight: 700,
-                    color: "#1a2e4a",
+                    color: "#051F20",
                     margin: "0 0 18px",
                   }}
                 >
-                  🗺️ Application Steps
+                  Application Steps
                 </h2>
                 <div
                   style={{
@@ -444,7 +570,7 @@ export default function Visa() {
                         display: "flex",
                         gap: 12,
                         alignItems: "flex-start",
-                        background: "#f8fafc",
+                        background: "#f0faf2",
                         borderRadius: 10,
                         padding: "12px 14px",
                       }}
@@ -454,7 +580,7 @@ export default function Visa() {
                           width: 34,
                           height: 34,
                           borderRadius: 8,
-                          background: "#2a6496",
+                          background: "#163832",
                           color: "#fff",
                           display: "flex",
                           alignItems: "center",
@@ -471,7 +597,7 @@ export default function Visa() {
                           style={{
                             fontWeight: 700,
                             fontSize: 14,
-                            color: "#1a2e4a",
+                            color: "#051F20",
                           }}
                         >
                           {step.title}
@@ -496,8 +622,8 @@ export default function Visa() {
             {/* CTA */}
             <div
               style={{
-                background: "#e8f4fd",
-                border: "1.5px solid #90caef",
+                background: "#DAF1DE",
+                border: "1.5px solid #8EB69B",
                 borderRadius: 12,
                 padding: 20,
                 display: "flex",
@@ -507,8 +633,8 @@ export default function Visa() {
               }}
             >
               <div style={{ flex: 1 }}>
-                <strong style={{ color: "#1a2e4a" }}>
-                  ⚠️ Always verify at the official source
+                <strong style={{ color: "#051F20" }}>
+                  Always verify at the official source
                 </strong>
                 <p style={{ margin: "4px 0 0", fontSize: 13, color: "#555" }}>
                   Visa rules, fees and requirements change. Verify current
@@ -523,7 +649,7 @@ export default function Visa() {
                     rel="noreferrer"
                     style={{
                       padding: "10px 18px",
-                      background: "#2a6496",
+                      background: "#163832",
                       color: "#fff",
                       borderRadius: 8,
                       textDecoration: "none",
@@ -542,8 +668,8 @@ export default function Visa() {
                     style={{
                       padding: "10px 18px",
                       background: "#fff",
-                      color: "#2a6496",
-                      border: "2px solid #2a6496",
+                      color: "#163832",
+                      border: "2px solid #163832",
                       borderRadius: 8,
                       textDecoration: "none",
                       fontWeight: 700,

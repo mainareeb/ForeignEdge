@@ -266,7 +266,7 @@ ${f.fullName || "Applicant"}`;
                   style={{
                     ...styles.stepCircle,
                     backgroundColor:
-                      step === i ? "#1a2e4a" : i < step ? "#27ae60" : "#e0e9f0",
+                      step === i ? "#051F20" : i < step ? "#27ae60" : "#e0e9f0",
                     color: step === i || i < step ? "#fff" : "#aaa",
                   }}
                 >
@@ -275,7 +275,7 @@ ${f.fullName || "Applicant"}`;
                 <span
                   style={{
                     ...styles.stepLabel,
-                    color: step === i ? "#1a2e4a" : "#888",
+                    color: step === i ? "#051F20" : "#888",
                     fontWeight: step === i ? "700" : "500",
                   }}
                 >
@@ -290,7 +290,7 @@ ${f.fullName || "Applicant"}`;
             {/* Step 0 — Personal & Target */}
             {step === 0 && (
               <div style={styles.card} className="fe-hoverable">
-                <h3 style={styles.cardTitle}>👤 Your Background</h3>
+                <h3 style={styles.cardTitle}>Your Background</h3>
                 <p style={styles.cardSub}>
                   Tell us about yourself and your target university
                 </p>
@@ -406,7 +406,7 @@ ${f.fullName || "Applicant"}`;
             {/* Step 1 — Academic Details */}
             {step === 1 && (
               <div style={styles.card}>
-                <h3 style={styles.cardTitle}>🎓 Academic Details</h3>
+                <h3 style={styles.cardTitle}>Academic Details</h3>
                 <p style={styles.cardSub}>Your current academic background</p>
 
                 <div style={styles.twoCol}>
@@ -518,7 +518,7 @@ ${f.fullName || "Applicant"}`;
             {/* Step 2 — Goals */}
             {step === 2 && (
               <div style={styles.card}>
-                <h3 style={styles.cardTitle}>🎯 Goals & Motivation</h3>
+                <h3 style={styles.cardTitle}>Goals & Motivation</h3>
                 <p style={styles.cardSub}>
                   This is the most important section — be specific and honest
                 </p>
@@ -599,7 +599,7 @@ ${f.fullName || "Applicant"}`;
                   >
                     {generating
                       ? "⏳ Generating SOP..."
-                      : "✨ Generate SOP with AI"}
+                      : "Generate SOP with AI"}
                   </button>
                 </div>
               </div>
@@ -610,7 +610,7 @@ ${f.fullName || "Applicant"}`;
               <div style={styles.card}>
                 <div style={styles.previewHeader}>
                   <div>
-                    <h3 style={styles.cardTitle}>📄 Your Generated SOP</h3>
+                    <h3 style={styles.cardTitle}>Your Generated SOP</h3>
                     <p style={styles.cardSub}>
                       {form.program} — {form.university} · {wordCount} words
                     </p>
@@ -627,8 +627,8 @@ ${f.fullName || "Applicant"}`;
                       {saving
                         ? "⏳ Saving..."
                         : activeSOPId
-                          ? "💾 Update"
-                          : "💾 Save SOP"}
+                          ? "Update"
+                          : "Save SOP"}
                     </button>
                   </div>
                 </div>
@@ -709,19 +709,19 @@ ${f.fullName || "Applicant"}`;
 const styles = {
   container: {
     fontFamily: "Segoe UI, sans-serif",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     minHeight: "100vh",
   },
   hero: {
     background:
-      "linear-gradient(135deg, #0a1628 0%, #1a2e4a 60%, #1e3d5c 100%)",
+      "linear-gradient(135deg, #051F20 0%, #051F20 60%, #0B2B26 100%)",
     padding: "55px 40px",
   },
   heroInner: { maxWidth: "650px", margin: "0 auto", textAlign: "center" },
   eyebrow: {
     fontSize: "12px",
     fontWeight: "700",
-    color: "#4a9eda",
+    color: "#8EB69B",
     textTransform: "uppercase",
     letterSpacing: "2px",
     margin: "0 0 10px",
@@ -733,12 +733,12 @@ const styles = {
     margin: "0 0 12px",
     letterSpacing: "-0.5px",
   },
-  heroSub: { fontSize: "15px", color: "#8fb3cc", margin: 0, lineHeight: "1.7" },
+  heroSub: { fontSize: "15px", color: "#8EB69B", margin: 0, lineHeight: "1.7" },
   wrapper: { padding: "30px 40px", maxWidth: "1100px", margin: "0 auto" },
   successMsg: {
     backgroundColor: "#e6f4ea",
     border: "1px solid #b7dfb8",
-    color: "#2d7a3a",
+    color: "#163832",
     padding: "14px 20px",
     borderRadius: "10px",
     marginBottom: "20px",
@@ -757,7 +757,7 @@ const styles = {
   },
   savedBarText: { fontSize: "14px", fontWeight: "600", color: "#b07d00" },
   savedBarBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#fff",
     border: "none",
     padding: "8px 18px",
@@ -783,14 +783,14 @@ const styles = {
   savedItemTitle: {
     fontSize: "14px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 4px",
   },
   savedItemSub: { fontSize: "12px", color: "#888", margin: 0 },
   savedItemBtns: { display: "flex", gap: "8px" },
   loadBtn: {
-    backgroundColor: "#e8f4fd",
-    color: "#1a6fa8",
+    backgroundColor: "#DAF1DE",
+    color: "#163832",
     border: "none",
     padding: "7px 16px",
     borderRadius: "8px",
@@ -830,7 +830,7 @@ const styles = {
     borderRadius: "10px",
     marginBottom: "6px",
   },
-  sideStepActive: { backgroundColor: "#f0f7ff" },
+  sideStepActive: { backgroundColor: "#f0faf2" },
   stepCircle: {
     width: "28px",
     height: "28px",
@@ -853,7 +853,7 @@ const styles = {
   cardTitle: {
     fontSize: "20px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 6px",
   },
   cardSub: { fontSize: "14px", color: "#888", margin: "0 0 24px" },
@@ -867,7 +867,7 @@ const styles = {
   label: {
     fontSize: "13px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     display: "block",
     marginBottom: "8px",
     textTransform: "uppercase",
@@ -881,7 +881,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
   },
   select: {
     width: "100%",
@@ -891,7 +891,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     cursor: "pointer",
   },
   textarea: {
@@ -902,7 +902,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     resize: "vertical",
     fontFamily: "Segoe UI, sans-serif",
     lineHeight: "1.6",
@@ -917,7 +917,7 @@ const styles = {
   },
   backBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 22px",
     borderRadius: "10px",
@@ -926,7 +926,7 @@ const styles = {
     fontWeight: "600",
   },
   nextBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "13px 28px",
@@ -946,7 +946,7 @@ const styles = {
     fontWeight: "700",
   },
   generateBtn: {
-    background: "linear-gradient(135deg, #1a2e4a, #4a9eda)",
+    background: "linear-gradient(135deg, #051F20, #8EB69B)",
     color: "#ffffff",
     border: "none",
     padding: "14px 32px",
@@ -965,8 +965,8 @@ const styles = {
   },
   previewActions: { display: "flex", gap: "12px", flexWrap: "wrap" },
   downloadBtn: {
-    backgroundColor: "#f0f4f8",
-    color: "#1a2e4a",
+    backgroundColor: "#f0faf2",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "11px 20px",
     borderRadius: "10px",
@@ -991,8 +991,8 @@ const styles = {
     marginBottom: "16px",
   },
   sopInfoTag: {
-    backgroundColor: "#f0f4f8",
-    color: "#1a2e4a",
+    backgroundColor: "#f0faf2",
+    color: "#051F20",
     padding: "5px 12px",
     borderRadius: "20px",
     fontSize: "12px",
@@ -1009,14 +1009,14 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "10px 16px",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     borderBottom: "1px solid #e0e9f0",
   },
   sopEditorLabel: { fontSize: "13px", fontWeight: "600", color: "#555" },
   resetBtn: {
     backgroundColor: "transparent",
     border: "none",
-    color: "#4a9eda",
+    color: "#8EB69B",
     cursor: "pointer",
     fontSize: "13px",
     fontWeight: "600",
@@ -1029,13 +1029,13 @@ const styles = {
     fontSize: "14px",
     lineHeight: "1.9",
     fontFamily: "Georgia, serif",
-    color: "#1a2e4a",
+    color: "#051F20",
     resize: "vertical",
     boxSizing: "border-box",
     backgroundColor: "#ffffff",
   },
   newBtn: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     color: "#ffffff",
     border: "none",
     padding: "12px 22px",
@@ -1047,7 +1047,7 @@ const styles = {
   bottomRow: { marginTop: "25px", marginBottom: "40px" },
   dashBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "12px 25px",
     borderRadius: "10px",

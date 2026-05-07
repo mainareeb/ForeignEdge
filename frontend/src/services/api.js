@@ -30,12 +30,14 @@ API.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ── Normalise errors + handle 401 ──────────────────────────────────────────
+// ── Normalise errors + handle 401 + 429 ─────────────────────────────────────
 API.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response) {
       const { status, data } = error.response;
+
+      // ── 401 Unauthorized — logout ──────────────────────────────────────────
       if (status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -43,16 +45,42 @@ API.interceptors.response.use(
           window.location.href = "/login";
         }
       }
+
+      // ── 429 Too Many Requests — rate limit ────────────────────────────────
+      if (status === 429) {
+        return Promise.reject(
+          new Error(
+            "⏱️ Too many requests! Please wait a moment and try again.",
+          ),
+        );
+      }
+
+      // ── 500 Server Error ───────────────────────────────────────────────────
+      if (status === 500) {
+        return Promise.reject(
+          new Error("🔧 Server error. Please try again in a moment."),
+        );
+      }
+
+      // ── 403 Forbidden ──────────────────────────────────────────────────────
+      if (status === 403) {
+        return Promise.reject(
+          new Error("🚫 Access denied. You don't have permission for this."),
+        );
+      }
+
       return Promise.reject(
         new Error(data?.error || data?.message || "Request failed"),
       );
     }
     if (error.code === "ECONNABORTED") {
-      return Promise.reject(new Error("Request timed out. Please try again."));
+      return Promise.reject(
+        new Error("⏰ Request timed out. Please try again."),
+      );
     }
     return Promise.reject(
       new Error(
-        "Cannot connect to server. Make sure the backend is running on port 5000.",
+        "📡 Cannot connect to server. Make sure the backend is running on port 5000.",
       ),
     );
   },
@@ -118,6 +146,8 @@ export const deleteSop = (id) => API.delete(`/sop/${id}`);
 // ── Chatbot ────────────────────────────────────────────────────────────────
 export const chatQuery = (data) =>
   API.post("/chat/query", typeof data === "string" ? { message: data } : data);
+export const getCountryInfo = (country) =>
+  API.get("/country-info", { params: { country } });
 
 // ── Stats ──────────────────────────────────────────────────────────────────
 export const getPlatformStats = () => API.get("/stats");

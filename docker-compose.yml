@@ -1,0 +1,30 @@
+# ── ForeignEdge Docker Compose ───────────────────────────────────────────────
+# Run both frontend + backend together with one command:
+# docker-compose up
+
+version: "3.8"
+
+services:
+  # ── Backend ──────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./BackEnd
+      dockerfile: Dockerfile
+    container_name: foreignedge-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./BackEnd/.env
+    restart: unless-stopped
+
+  # ── Frontend ─────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: foreignedge-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

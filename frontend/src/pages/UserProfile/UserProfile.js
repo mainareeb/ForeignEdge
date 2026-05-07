@@ -143,7 +143,10 @@ function UserProfile() {
       await updateProfile(formData);
       setSuccessMsg("Profile updated successfully!");
     } catch (err) {
-      setError(err.message || "Failed to save profile. Please check your connection and try again.");
+      setError(
+        err.message ||
+          "Failed to save profile. Please check your connection and try again.",
+      );
     } finally {
       setSaving(false);
       setTimeout(() => setSuccessMsg(""), 3000);
@@ -179,12 +182,12 @@ function UserProfile() {
   );
 
   const tabs = [
-    { id: "personal", label: "👤 Personal" },
-    { id: "academic", label: "🎓 Academic" },
-    { id: "skills", label: "💡 Skills" },
-    { id: "achievements", label: "🏆 Achievements" },
-    { id: "social", label: "🔗 Social" },
-    { id: "saved", label: "❤️ Saved" },
+    { id: "personal", label: "Personal" },
+    { id: "academic", label: "Academic" },
+    { id: "skills", label: "Skills" },
+    { id: "achievements", label: "Achievements" },
+    { id: "social", label: "Social" },
+    { id: "saved", label: "Saved" },
   ];
 
   if (loading) {
@@ -261,23 +264,75 @@ function UserProfile() {
             <p style={styles.completionHint}>
               {completion < 100
                 ? "Complete your profile for better recommendations!"
-                : "🎉 Profile Complete!"}
+                : "Profile Complete!"}
             </p>
           </div>
         </div>
       </div>
 
       <div style={styles.wrapper}>
-        {error && (<div style={{ background:"#fef2f2", border:"1px solid #fca5a5", borderRadius:10, padding:"14px 18px", margin:"16px 0", color:"#dc2626", fontSize:14, display:"flex", justifyContent:"space-between" }}><span>⚠️ {error}</span><button onClick={() => setError("")} style={{ background:"none", border:"none", cursor:"pointer", color:"#dc2626", fontWeight:700 }}>✕</button></div>)}
-        
+        {error && (
+          <div
+            style={{
+              background: "#fef2f2",
+              border: "1px solid #fca5a5",
+              borderRadius: 10,
+              padding: "14px 18px",
+              margin: "16px 0",
+              color: "#dc2626",
+              fontSize: 14,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>⚠️ {error}</span>
+            <button
+              onClick={() => setError("")}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#dc2626",
+                fontWeight: 700,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Success Message */}
         {error && (
-            <div style={{ background:"#fef2f2", border:"1px solid #fca5a5", borderRadius:10, padding:"12px 16px", marginBottom:12, color:"#dc2626", fontSize:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <span>⚠️ {error}</span>
-              <button onClick={() => setError("")} style={{ background:"none", border:"none", cursor:"pointer", color:"#dc2626", fontWeight:700 }}>✕</button>
-            </div>
-          )}
-          {successMsg && <div style={styles.successMsg}>✅ {successMsg}</div>}
+          <div
+            style={{
+              background: "#fef2f2",
+              border: "1px solid #fca5a5",
+              borderRadius: 10,
+              padding: "12px 16px",
+              marginBottom: 12,
+              color: "#dc2626",
+              fontSize: 14,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>⚠️ {error}</span>
+            <button
+              onClick={() => setError("")}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#dc2626",
+                fontWeight: 700,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+        {successMsg && <div style={styles.successMsg}>✅ {successMsg}</div>}
 
         {/* Tabs */}
         <div style={styles.tabsWrapper}>
@@ -297,7 +352,7 @@ function UserProfile() {
         {/* Personal Info Tab */}
         {activeTab === "personal" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>👤 Personal Information</h3>
+            <h3 style={styles.cardTitle}>Personal Information</h3>
             <p style={styles.cardSubtitle}>Update your personal details</p>
 
             <div style={styles.twoCol}>
@@ -422,7 +477,7 @@ function UserProfile() {
         {/* Academic Info Tab */}
         {activeTab === "academic" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>🎓 Academic Information</h3>
+            <h3 style={styles.cardTitle}>Academic Information</h3>
             <p style={styles.cardSubtitle}>
               Your academic background for better recommendations
             </p>
@@ -585,7 +640,7 @@ function UserProfile() {
         {/* Skills & Languages Tab */}
         {activeTab === "skills" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>💡 Skills & Languages</h3>
+            <h3 style={styles.cardTitle}>Skills & Languages</h3>
             <p style={styles.cardSubtitle}>
               Add your technical skills and languages you know
             </p>
@@ -729,7 +784,7 @@ function UserProfile() {
         {/* Achievements & Certifications Tab */}
         {activeTab === "achievements" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>🏆 Achievements & Certifications</h3>
+            <h3 style={styles.cardTitle}>Achievements & Certifications</h3>
             <p style={styles.cardSubtitle}>
               Add your certifications, awards and achievements
             </p>
@@ -815,7 +870,7 @@ function UserProfile() {
         {/* Social Links Tab */}
         {activeTab === "social" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>🔗 Social & Professional Links</h3>
+            <h3 style={styles.cardTitle}>Social & Professional Links</h3>
             <p style={styles.cardSubtitle}>
               Connect your professional profiles
             </p>
@@ -924,7 +979,7 @@ function UserProfile() {
         {/* Saved Items Tab */}
         {activeTab === "saved" && (
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>❤️ Saved Items</h3>
+            <h3 style={styles.cardTitle}>Saved Items</h3>
             <p style={styles.cardSubtitle}>
               Universities and scholarships you have saved
             </p>
@@ -981,7 +1036,7 @@ function UserProfile() {
 const styles = {
   container: {
     fontFamily: "Segoe UI, sans-serif",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     minHeight: "100vh",
   },
   loadingWrapper: {
@@ -990,9 +1045,9 @@ const styles = {
     alignItems: "center",
     height: "80vh",
   },
-  loadingText: { fontSize: "18px", color: "#1a2e4a" },
+  loadingText: { fontSize: "18px", color: "#051F20" },
   hero: {
-    background: "linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%)",
+    background: "linear-gradient(135deg, #051F20 0%, #051F20 100%)",
     padding: "40px",
     position: "relative",
   },
@@ -1016,7 +1071,7 @@ const styles = {
   photoCircle: {
     width: "100px",
     height: "100px",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -1050,11 +1105,11 @@ const styles = {
   },
   heroDegree: {
     fontSize: "15px",
-    color: "#4a9eda",
+    color: "#8EB69B",
     margin: "0 0 6px",
     fontWeight: "600",
   },
-  heroLocation: { fontSize: "14px", color: "#b0c4d8", margin: "0 0 12px" },
+  heroLocation: { fontSize: "14px", color: "#8EB69B", margin: "0 0 12px" },
   heroTags: { display: "flex", gap: "8px", flexWrap: "wrap" },
   heroTag: {
     backgroundColor: "rgba(74,158,218,0.3)",
@@ -1073,7 +1128,7 @@ const styles = {
   },
   completionLabel: {
     fontSize: "12px",
-    color: "#b0c4d8",
+    color: "#8EB69B",
     margin: "0 0 10px",
     textTransform: "uppercase",
     fontWeight: "600",
@@ -1081,7 +1136,7 @@ const styles = {
   completionCircle: {
     width: "70px",
     height: "70px",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -1096,17 +1151,17 @@ const styles = {
     marginBottom: "8px",
   },
   completionFill: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     height: "100%",
     borderRadius: "10px",
     transition: "width 0.5s ease",
   },
-  completionHint: { fontSize: "11px", color: "#b0c4d8", margin: 0 },
+  completionHint: { fontSize: "11px", color: "#8EB69B", margin: 0 },
   wrapper: { padding: "25px 40px", maxWidth: "900px", margin: "0 auto" },
   successMsg: {
     backgroundColor: "#e6f4ea",
     border: "1px solid #b7dfb8",
-    color: "#2d7a3a",
+    color: "#163832",
     padding: "14px 20px",
     borderRadius: "10px",
     marginBottom: "20px",
@@ -1139,7 +1194,7 @@ const styles = {
     padding: "10px 20px",
     borderRadius: "8px",
     border: "none",
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     cursor: "pointer",
     fontSize: "13px",
@@ -1156,7 +1211,7 @@ const styles = {
   cardTitle: {
     fontSize: "20px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "8px",
   },
   cardSubtitle: { fontSize: "14px", color: "#888", marginBottom: "25px" },
@@ -1170,7 +1225,7 @@ const styles = {
   label: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#1a2e4a",
+    color: "#051F20",
     display: "block",
     marginBottom: "8px",
   },
@@ -1182,7 +1237,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
   },
   inputDisabled: {
     width: "100%",
@@ -1192,7 +1247,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     color: "#999",
     cursor: "not-allowed",
   },
@@ -1204,7 +1259,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     cursor: "pointer",
   },
   textarea: {
@@ -1215,7 +1270,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     resize: "vertical",
     fontFamily: "Segoe UI, sans-serif",
   },
@@ -1233,12 +1288,12 @@ const styles = {
   sectionBlockTitle: {
     fontSize: "16px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "15px",
   },
   addRow: { display: "flex", gap: "12px", marginBottom: "15px" },
   addBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "12px 20px",
@@ -1255,8 +1310,8 @@ const styles = {
     minHeight: "40px",
   },
   tag: {
-    backgroundColor: "#e8f4fd",
-    color: "#1a6fa8",
+    backgroundColor: "#DAF1DE",
+    color: "#163832",
     padding: "6px 14px",
     borderRadius: "20px",
     fontSize: "13px",
@@ -1267,7 +1322,7 @@ const styles = {
   },
   tagGreen: {
     backgroundColor: "#e6f4ea",
-    color: "#2d7a3a",
+    color: "#163832",
     padding: "6px 14px",
     borderRadius: "20px",
     fontSize: "13px",
@@ -1291,8 +1346,8 @@ const styles = {
     marginTop: "12px",
   },
   suggestedTag: {
-    backgroundColor: "#f0f4f8",
-    color: "#1a2e4a",
+    backgroundColor: "#f0faf2",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "6px 14px",
     borderRadius: "20px",
@@ -1302,7 +1357,7 @@ const styles = {
   },
   suggestedTagGreen: {
     backgroundColor: "#f0faf2",
-    color: "#2d7a3a",
+    color: "#163832",
     border: "1.5px solid #b7dfb8",
     padding: "6px 14px",
     borderRadius: "20px",
@@ -1315,12 +1370,12 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "15px",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     padding: "20px",
     borderRadius: "12px",
   },
   addCertBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "12px 20px",
@@ -1334,7 +1389,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "15px",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     padding: "15px 20px",
     borderRadius: "12px",
     border: "1px solid #e0e9f0",
@@ -1344,7 +1399,7 @@ const styles = {
   certName: {
     fontSize: "15px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 4px",
   },
   certIssuer: { fontSize: "13px", color: "#666", margin: 0 },
@@ -1362,7 +1417,7 @@ const styles = {
   inputWithIcon: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     border: "1.5px solid #e0e9f0",
     borderRadius: "10px",
     overflow: "hidden",
@@ -1378,21 +1433,21 @@ const styles = {
   },
   profilePreview: {
     marginTop: "25px",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     borderRadius: "12px",
     padding: "20px",
   },
   previewTitle: {
     fontSize: "15px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "15px",
   },
   previewCard: { display: "flex", alignItems: "center", gap: "20px" },
   previewAvatar: {
     width: "60px",
     height: "60px",
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -1408,12 +1463,12 @@ const styles = {
   previewName: {
     fontSize: "18px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     margin: "0 0 4px",
   },
   previewDegree: {
     fontSize: "14px",
-    color: "#4a9eda",
+    color: "#8EB69B",
     margin: "0 0 4px",
     fontWeight: "600",
   },
@@ -1425,8 +1480,8 @@ const styles = {
     marginBottom: "8px",
   },
   previewSkillTag: {
-    backgroundColor: "#e8f4fd",
-    color: "#1a6fa8",
+    backgroundColor: "#DAF1DE",
+    color: "#163832",
     padding: "3px 10px",
     borderRadius: "12px",
     fontSize: "11px",
@@ -1441,14 +1496,14 @@ const styles = {
   },
   savedSection: { marginBottom: "25px" },
   emptyBox: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     borderRadius: "12px",
     padding: "30px",
     textAlign: "center",
   },
   emptyText: { fontSize: "15px", color: "#888", marginBottom: "15px" },
   goBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "12px 25px",
@@ -1466,7 +1521,7 @@ const styles = {
   },
   cancelBtn: {
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     border: "1.5px solid #e0e9f0",
     padding: "14px 25px",
     borderRadius: "10px",
@@ -1475,7 +1530,7 @@ const styles = {
     fontWeight: "600",
   },
   saveBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     border: "none",
     padding: "14px 35px",

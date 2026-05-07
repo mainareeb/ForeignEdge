@@ -23,7 +23,7 @@ const QUICK_LINKS = [
     label: "Universities",
     icon: "🎓",
     path: "/universities",
-    color: "#e8f4fd",
+    color: "#DAF1DE",
   },
   {
     label: "Scholarships",
@@ -36,7 +36,7 @@ const QUICK_LINKS = [
   { label: "Tracker", icon: "📊", path: "/tracker", color: "#f0e8fd" },
   { label: "SOP Builder", icon: "✍️", path: "/sop", color: "#e8fdf6" },
   { label: "Reminders", icon: "📅", path: "/reminders", color: "#fdf8e8" },
-  { label: "Compare", icon: "⚖️", path: "/compare", color: "#e8f4fd" },
+  { label: "Compare", icon: "⚖️", path: "/compare", color: "#DAF1DE" },
 ];
 
 function timeAgo(iso) {
@@ -64,7 +64,7 @@ const CSS = `
 }
 .dash-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important; }
 .skel {
-  background: linear-gradient(90deg,#e8eef4 25%,#f4f7fa 50%,#e8eef4 75%);
+  background: linear-gradient(90deg,#f0faf2 25%,#f4f7fa 50%,#f0faf2 75%);
   background-size: 400px 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 8px;
@@ -120,20 +120,16 @@ export default function Dashboard() {
 
   // Activity feed from real data
   const activity = [
-    ...apps
-      .slice(0, 3)
-      .map((a) => ({
-        text: `Tracked: ${a.university || "University"} — ${a.program || ""}`,
-        time: a.updatedAt,
-        icon: "🎓",
-      })),
-    ...rems
-      .slice(0, 3)
-      .map((r) => ({
-        text: `Reminder: ${r.title}`,
-        time: r.createdAt,
-        icon: "📅",
-      })),
+    ...apps.slice(0, 3).map((a) => ({
+      text: `Tracked: ${a.university || "University"} — ${a.program || ""}`,
+      time: a.updatedAt,
+      icon: "🎓",
+    })),
+    ...rems.slice(0, 3).map((r) => ({
+      text: `Reminder: ${r.title}`,
+      time: r.createdAt,
+      icon: "📅",
+    })),
   ]
     .sort((a, b) => new Date(b.time) - new Date(a.time))
     .slice(0, 5);
@@ -148,7 +144,7 @@ export default function Dashboard() {
       {/* Hero */}
       <div
         style={{
-          background: "linear-gradient(135deg,#1a2e4a,#2a6496)",
+          background: "linear-gradient(135deg,#051F20,#163832)",
           padding: "40px 24px",
           color: "#fff",
         }}
@@ -161,7 +157,7 @@ export default function Dashboard() {
             />
           ) : (
             <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>
-              Welcome back, {name}! 👋
+              Welcome back, {name}!
             </h1>
           )}
           <p style={{ opacity: 0.8, marginTop: 8, fontSize: 15 }}>
@@ -187,7 +183,7 @@ export default function Dashboard() {
               onClick={fetchAll}
               style={{
                 padding: "8px 20px",
-                background: "#1a2e4a",
+                background: "#051F20",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -215,8 +211,8 @@ export default function Dashboard() {
               value: loading ? null : apps.length,
               sub: `${apps.filter((a) => a.status === "Submitted").length} submitted`,
               icon: "📊",
-              color: "#e8f4fd",
-              border: "#2a6496",
+              color: "#DAF1DE",
+              border: "#163832",
               path: "/tracker",
             },
             {
@@ -234,7 +230,7 @@ export default function Dashboard() {
               sub: "Statements of purpose",
               icon: "✍️",
               color: "#e8fdf0",
-              border: "#2d7a3a",
+              border: "#163832",
               path: "/sop",
             },
             {
@@ -274,7 +270,7 @@ export default function Dashboard() {
                       style={{
                         fontSize: 32,
                         fontWeight: 800,
-                        color: "#1a2e4a",
+                        color: "#051F20",
                         lineHeight: 1,
                       }}
                     >
@@ -321,7 +317,7 @@ export default function Dashboard() {
               style={{
                 fontSize: 16,
                 fontWeight: 700,
-                color: "#1a2e4a",
+                color: "#051F20",
                 margin: "0 0 16px",
               }}
             >
@@ -387,7 +383,7 @@ export default function Dashboard() {
                       width: 36,
                       height: 36,
                       borderRadius: 8,
-                      background: "#f0f5fa",
+                      background: "#f0faf2",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -440,7 +436,7 @@ export default function Dashboard() {
                 style={{
                   fontSize: 16,
                   fontWeight: 700,
-                  color: "#1a2e4a",
+                  color: "#051F20",
                   margin: 0,
                 }}
               >
@@ -450,7 +446,7 @@ export default function Dashboard() {
                 to="/reminders"
                 style={{
                   fontSize: 13,
-                  color: "#2a6496",
+                  color: "#163832",
                   textDecoration: "none",
                   fontWeight: 600,
                 }}
@@ -482,7 +478,7 @@ export default function Dashboard() {
                   to="/reminders"
                   style={{
                     fontSize: 13,
-                    color: "#2a6496",
+                    color: "#163832",
                     display: "block",
                     marginTop: 8,
                   }}
@@ -500,7 +496,7 @@ export default function Dashboard() {
                     ? { bg: "#fdecea", text: "#c0392b", label: "Today!" }
                     : days <= 7
                       ? { bg: "#fff3e0", text: "#e65100", label: `${days}d` }
-                      : { bg: "#e8fdf0", text: "#2d7a3a", label: `${days}d` };
+                      : { bg: "#e8fdf0", text: "#163832", label: `${days}d` };
                 return (
                   <div
                     key={i}
@@ -540,7 +536,7 @@ export default function Dashboard() {
                         style={{
                           fontSize: 13,
                           fontWeight: 600,
-                          color: "#1a2e4a",
+                          color: "#051F20",
                           margin: 0,
                         }}
                       >
@@ -578,7 +574,7 @@ export default function Dashboard() {
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: "#1a2e4a",
+              color: "#051F20",
               margin: "0 0 16px",
             }}
           >
@@ -606,7 +602,7 @@ export default function Dashboard() {
                 >
                   <div style={{ fontSize: 24, marginBottom: 6 }}>{l.icon}</div>
                   <div
-                    style={{ fontSize: 13, fontWeight: 600, color: "#1a2e4a" }}
+                    style={{ fontSize: 13, fontWeight: 600, color: "#051F20" }}
                   >
                     {l.label}
                   </div>

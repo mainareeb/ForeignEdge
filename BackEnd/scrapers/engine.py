@@ -119,6 +119,39 @@ def _get(url: str, params: dict = None, headers: dict = None,
     return None
 
 
+# ── Scrap.do helper ──────────────────────────────────────────────────────────
+def _scrapdо_get(url: str, params: dict = None) -> Optional[Any]:
+    """
+    Fetch any URL via Scrap.do API — bypasses blocks and CAPTCHAs.
+    Falls back to direct _get if Scrap.do key not set.
+    """
+    import requests, os
+    api_key = os.getenv("SCRAP_DO_API_KEY", "")
+    if not api_key:
+        logger.warning("SCRAP_DO_API_KEY not set — using direct request")
+        return _get(url, params=params)
+
+    # Build full URL with params
+    if params:
+        import urllib.parse
+        query = urllib.parse.urlencode(params)
+        full_url = f"{url}?{query}"
+    else:
+        full_url = url
+
+    scrapdо_url = f"https://api.scrapdo.io/scrape?token={api_key}&url={full_url}&render=false"
+
+    try:
+        resp = requests.get(scrapdо_url, timeout=30)
+        resp.raise_for_status()
+        content_type = resp.headers.get("content-type", "")
+        if "json" in content_type:
+            return resp.json()
+        return resp.text
+    except Exception as e:
+        logger.warning("Scrap.do failed for %s: %s — falling back to direct", url, e)
+        return _get(url, params=params)
+
 # ══════════════════════════════════════════════════════════════════════════════
 # UNIVERSITIES
 # ══════════════════════════════════════════════════════════════════════════════
@@ -318,24 +351,30 @@ def get_scholarships_from_db(
 
 def get_exchange_rates(base: str = "USD") -> dict:
     """
-    Fetch live exchange rates from Open Exchange Rates (free tier).
-    Fallback: er-api.com (no key needed).
-    Source: https://open.er-api.com/v6/latest/USD
+    Fetch live exchange rates from ExchangeRate-API (authenticated, 1500 req/month free).
+    Fallback: open.er-api.com (no key).
+    Source: https://v6.exchangerate-api.com
     """
+    import os
     cache_key = f"exchange_rates:{base}"
     cached = _cache_get(cache_key)
     if cached:
         return cached
 
-    # Primary: er-api.com (free, no key, 1500 req/month)
-    data = _get(f"https://open.er-api.com/v6/latest/{base}")
+    # Primary: ExchangeRate-API with key (more reliable)
+    api_key = os.getenv("EXCHANGE_RATE_API_KEY", "")
+    if api_key:
+        data = _get(f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{base}")
+    else:
+        # Fallback: open.er-api.com (no key needed)
+        data = _get(f"https://open.er-api.com/v6/latest/{base}")
 
     if data and isinstance(data, dict) and "rates" in data:
         result = {
             "base":   base,
             "rates":  data["rates"],
             "date":   data.get("time_last_update_utc", ""),
-            "source": "open.er-api.com (free tier)",
+            "source": "ExchangeRate-API (live, authenticated)",
             "fetched_at": datetime.datetime.utcnow().isoformat() + "Z",
         }
         _cache_set(cache_key, result)
@@ -426,7 +465,7 @@ def scrape_accommodation_costs(country: str = "UK", city: str = None) -> dict:
     if target_city_slug:
         # Numbeo public page scraping
         url = f"https://www.numbeo.com/cost-of-living/in/{target_city_slug}"
-        html = _get(url, headers={"Accept": "text/html"}, timeout=8)
+        html = _scrapdо_get(url)
         if html and isinstance(html, str):
             numbeo_data = _parse_numbeo_html(html, target_city_slug)
 
@@ -1496,6 +1535,114 @@ def _static_visa_data(country: str) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 # CROSS-PAGE INTEGRATION
 # ══════════════════════════════════════════════════════════════════════════════
+
+# ── RestCountries API — free, no key needed ──────────────────────────────────
+COUNTRY_NAME_MAP = {
+    "UK":          "United Kingdom",
+    "USA":         "United States",
+    "Canada":      "Canada",
+    "Australia":   "Australia",
+    "Germany":     "Germany",
+    "Netherlands": "Netherlands",
+    "Sweden":      "Sweden",
+    "France":      "France",
+    "Japan":       "Japan",
+    "South Korea": "South Korea",
+    "China":       "China",
+    "Turkey":      "Turkey",
+    "Malaysia":    "Malaysia",
+    "Singapore":   "Singapore",
+    "New Zealand": "New Zealand",
+    "Switzerland": "Switzerland",
+    "Finland":     "Finland",
+    "Norway":      "Norway",
+    "Ireland":     "Ireland",
+    "Italy":       "Italy",
+}
+
+# ── Static country database — always works offline ────────────────────────────
+COUNTRY_STATIC_DB = {
+    "UK":          {"official_name":"United Kingdom of Great Britain","capital":"London","region":"Europe","population":67215293,"flag_emoji":"🇬🇧","flag_url":"https://flagcdn.com/w320/gb.png","currencies":["Pound sterling (GBP)"],"languages":["English"],"calling_code":"+44","timezones":["UTC+00:00"]},
+    "USA":         {"official_name":"United States of America","capital":"Washington D.C.","region":"Americas","population":331002651,"flag_emoji":"🇺🇸","flag_url":"https://flagcdn.com/w320/us.png","currencies":["United States dollar (USD)"],"languages":["English"],"calling_code":"+1","timezones":["UTC-05:00"]},
+    "Canada":      {"official_name":"Canada","capital":"Ottawa","region":"Americas","population":37742154,"flag_emoji":"🇨🇦","flag_url":"https://flagcdn.com/w320/ca.png","currencies":["Canadian dollar (CAD)"],"languages":["English","French"],"calling_code":"+1","timezones":["UTC-05:00"]},
+    "Australia":   {"official_name":"Commonwealth of Australia","capital":"Canberra","region":"Oceania","population":25499884,"flag_emoji":"🇦🇺","flag_url":"https://flagcdn.com/w320/au.png","currencies":["Australian dollar (AUD)"],"languages":["English"],"calling_code":"+61","timezones":["UTC+10:00"]},
+    "Germany":     {"official_name":"Federal Republic of Germany","capital":"Berlin","region":"Europe","population":83240525,"flag_emoji":"🇩🇪","flag_url":"https://flagcdn.com/w320/de.png","currencies":["Euro (EUR)"],"languages":["German"],"calling_code":"+49","timezones":["UTC+01:00"]},
+    "Netherlands": {"official_name":"Kingdom of the Netherlands","capital":"Amsterdam","region":"Europe","population":17134872,"flag_emoji":"🇳🇱","flag_url":"https://flagcdn.com/w320/nl.png","currencies":["Euro (EUR)"],"languages":["Dutch"],"calling_code":"+31","timezones":["UTC+01:00"]},
+    "Sweden":      {"official_name":"Kingdom of Sweden","capital":"Stockholm","region":"Europe","population":10099265,"flag_emoji":"🇸🇪","flag_url":"https://flagcdn.com/w320/se.png","currencies":["Swedish krona (SEK)"],"languages":["Swedish"],"calling_code":"+46","timezones":["UTC+01:00"]},
+    "France":      {"official_name":"French Republic","capital":"Paris","region":"Europe","population":67391582,"flag_emoji":"🇫🇷","flag_url":"https://flagcdn.com/w320/fr.png","currencies":["Euro (EUR)"],"languages":["French"],"calling_code":"+33","timezones":["UTC+01:00"]},
+    "Japan":       {"official_name":"Japan","capital":"Tokyo","region":"Asia","population":125836021,"flag_emoji":"🇯🇵","flag_url":"https://flagcdn.com/w320/jp.png","currencies":["Japanese yen (JPY)"],"languages":["Japanese"],"calling_code":"+81","timezones":["UTC+09:00"]},
+    "South Korea": {"official_name":"Republic of Korea","capital":"Seoul","region":"Asia","population":51269185,"flag_emoji":"🇰🇷","flag_url":"https://flagcdn.com/w320/kr.png","currencies":["South Korean won (KRW)"],"languages":["Korean"],"calling_code":"+82","timezones":["UTC+09:00"]},
+    "China":       {"official_name":"People's Republic of China","capital":"Beijing","region":"Asia","population":1402112000,"flag_emoji":"🇨🇳","flag_url":"https://flagcdn.com/w320/cn.png","currencies":["Chinese yuan (CNY)"],"languages":["Mandarin"],"calling_code":"+86","timezones":["UTC+08:00"]},
+    "Turkey":      {"official_name":"Republic of Turkey","capital":"Ankara","region":"Asia","population":84339067,"flag_emoji":"🇹🇷","flag_url":"https://flagcdn.com/w320/tr.png","currencies":["Turkish lira (TRY)"],"languages":["Turkish"],"calling_code":"+90","timezones":["UTC+03:00"]},
+    "Malaysia":    {"official_name":"Malaysia","capital":"Kuala Lumpur","region":"Asia","population":32365999,"flag_emoji":"🇲🇾","flag_url":"https://flagcdn.com/w320/my.png","currencies":["Malaysian ringgit (MYR)"],"languages":["Malay"],"calling_code":"+60","timezones":["UTC+08:00"]},
+    "Singapore":   {"official_name":"Republic of Singapore","capital":"Singapore","region":"Asia","population":5850342,"flag_emoji":"🇸🇬","flag_url":"https://flagcdn.com/w320/sg.png","currencies":["Singapore dollar (SGD)"],"languages":["English","Malay","Tamil","Chinese"],"calling_code":"+65","timezones":["UTC+08:00"]},
+    "New Zealand": {"official_name":"New Zealand","capital":"Wellington","region":"Oceania","population":5084300,"flag_emoji":"🇳🇿","flag_url":"https://flagcdn.com/w320/nz.png","currencies":["New Zealand dollar (NZD)"],"languages":["English","Maori"],"calling_code":"+64","timezones":["UTC+12:00"]},
+    "Switzerland": {"official_name":"Swiss Confederation","capital":"Bern","region":"Europe","population":8654622,"flag_emoji":"🇨🇭","flag_url":"https://flagcdn.com/w320/ch.png","currencies":["Swiss franc (CHF)"],"languages":["German","French","Italian","Romansh"],"calling_code":"+41","timezones":["UTC+01:00"]},
+    "Finland":     {"official_name":"Republic of Finland","capital":"Helsinki","region":"Europe","population":5530719,"flag_emoji":"🇫🇮","flag_url":"https://flagcdn.com/w320/fi.png","currencies":["Euro (EUR)"],"languages":["Finnish","Swedish"],"calling_code":"+358","timezones":["UTC+02:00"]},
+    "Norway":      {"official_name":"Kingdom of Norway","capital":"Oslo","region":"Europe","population":5421241,"flag_emoji":"🇳🇴","flag_url":"https://flagcdn.com/w320/no.png","currencies":["Norwegian krone (NOK)"],"languages":["Norwegian"],"calling_code":"+47","timezones":["UTC+01:00"]},
+    "Ireland":     {"official_name":"Republic of Ireland","capital":"Dublin","region":"Europe","population":4994724,"flag_emoji":"🇮🇪","flag_url":"https://flagcdn.com/w320/ie.png","currencies":["Euro (EUR)"],"languages":["Irish","English"],"calling_code":"+353","timezones":["UTC+00:00"]},
+    "Italy":       {"official_name":"Italian Republic","capital":"Rome","region":"Europe","population":60461826,"flag_emoji":"🇮🇹","flag_url":"https://flagcdn.com/w320/it.png","currencies":["Euro (EUR)"],"languages":["Italian"],"calling_code":"+39","timezones":["UTC+01:00"]},
+}
+
+def get_country_info(country: str) -> dict:
+    """
+    Returns country details. Tries RestCountries API first,
+    falls back to verified static database.
+    """
+    cache_key = f"country_info:{country}"
+    cached = _cache_get(cache_key)
+    if cached:
+        return cached
+
+    # Try RestCountries API first
+    country_name = COUNTRY_NAME_MAP.get(country, country)
+    try:
+        data = _get(f"https://restcountries.com/v3.1/name/{country_name}?fullText=true")
+        if data and isinstance(data, list) and len(data) > 0:
+            c = data[0]
+            currencies = c.get("currencies", {})
+            currency_list = [f"{info.get('name','')} ({code})" for code, info in currencies.items()]
+            languages = list(c.get("languages", {}).values())
+            result = {
+                "name":          country,
+                "official_name": c.get("name", {}).get("official", country),
+                "capital":       c.get("capital", [""])[0] if c.get("capital") else "",
+                "region":        c.get("region", ""),
+                "population":    c.get("population", 0),
+                "flag_emoji":    c.get("flag", ""),
+                "flag_url":      c.get("flags", {}).get("png", ""),
+                "currencies":    currency_list,
+                "languages":     languages,
+                "calling_code":  "+44",
+                "source":        "RestCountries API (live)",
+                "fetched_at":    datetime.datetime.utcnow().isoformat() + "Z",
+            }
+            _cache_set(cache_key, result)
+            return result
+    except Exception:
+        pass
+
+    # Use static database
+    static = COUNTRY_STATIC_DB.get(country, {})
+    result = {
+        "name":          country,
+        "official_name": static.get("official_name", country),
+        "capital":       static.get("capital", ""),
+        "region":        static.get("region", ""),
+        "population":    static.get("population", 0),
+        "flag_emoji":    static.get("flag_emoji", ""),
+        "flag_url":      static.get("flag_url", ""),
+        "currencies":    static.get("currencies", []),
+        "languages":     static.get("languages", []),
+        "calling_code":  static.get("calling_code", ""),
+        "timezones":     static.get("timezones", []),
+        "source":        "Verified Static Database",
+        "fetched_at":    datetime.datetime.utcnow().isoformat() + "Z",
+    }
+    _cache_set(cache_key, result)
+    logger.info("Country info served from static DB for %s", country)
+    return result
+
 
 def get_integrated_country_data(country: str, db) -> dict:
     """

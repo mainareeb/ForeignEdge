@@ -247,7 +247,7 @@ function AcademicProfile() {
         {/* Step 1 — Academic Background */}
         {step === 1 && (
           <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>🎓 Academic Background</h2>
+            <h2 style={styles.stepTitle}>Academic Background</h2>
             <p style={styles.stepSubtitle}>
               Tell us about your current education
             </p>
@@ -319,7 +319,7 @@ function AcademicProfile() {
         {/* Step 2 — English Proficiency */}
         {step === 2 && (
           <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>📝 English Proficiency</h2>
+            <h2 style={styles.stepTitle}>English Proficiency</h2>
             <p style={styles.stepSubtitle}>
               Your English test scores help us find matching universities
             </p>
@@ -393,8 +393,8 @@ function AcademicProfile() {
 
             {formData.englishTest === "Not taken yet" && (
               <div style={styles.infoBox}>
-                💡 No worries! Many universities accept students who plan to
-                take the test. We'll show you options for both.
+                Note: Many universities accept students who plan to take the
+                test. We'll show you options for both.
               </div>
             )}
           </div>
@@ -403,7 +403,7 @@ function AcademicProfile() {
         {/* Step 3 — Study Preferences */}
         {step === 3 && (
           <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>🌍 Study Preferences</h2>
+            <h2 style={styles.stepTitle}>Study Preferences</h2>
             <p style={styles.stepSubtitle}>
               Where and what do you want to study?
             </p>
@@ -516,7 +516,7 @@ function AcademicProfile() {
         {/* Step 4 — Budget & Funding */}
         {step === 4 && (
           <div style={styles.stepContent}>
-            <h2 style={styles.stepTitle}>💰 Budget & Funding</h2>
+            <h2 style={styles.stepTitle}>Budget & Funding</h2>
             <p style={styles.stepSubtitle}>
               Help us find the right scholarships for you
             </p>
@@ -573,18 +573,16 @@ function AcademicProfile() {
 
             {/* Summary */}
             <div style={styles.summaryBox}>
-              <h4 style={styles.summaryTitle}>📋 Your Profile Summary</h4>
+              <h4 style={styles.summaryTitle}>Your Profile Summary</h4>
               <p style={styles.summaryItem}>
-                🎓 Degree: {formData.degree || "Not set"}
+                Degree: {formData.degree || "Not set"}
               </p>
               <p style={styles.summaryItem}>
-                📚 Field: {formData.field || "Not set"}
+                Field: {formData.field || "Not set"}
               </p>
+              <p style={styles.summaryItem}>GPA: {formData.gpa || "Not set"}</p>
               <p style={styles.summaryItem}>
-                📊 GPA: {formData.gpa || "Not set"}
-              </p>
-              <p style={styles.summaryItem}>
-                📝 English: {formData.englishTest}{" "}
+                English: {formData.englishTest}{" "}
                 {formData.ieltsScore ? `(${formData.ieltsScore})` : ""}
               </p>
               <p style={styles.summaryItem}>
@@ -627,22 +625,22 @@ function AcademicProfile() {
 const styles = {
   container: {
     fontFamily: "Segoe UI, sans-serif",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f0faf2",
     minHeight: "100vh",
     paddingBottom: "60px",
   },
   header: {
-    background: "linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%)",
+    background: "linear-gradient(135deg, #051F20 0%, #051F20 100%)",
     padding: "30px 40px",
     textAlign: "center",
   },
   logo: {
     fontSize: "28px",
     fontWeight: "800",
-    color: "#4a9eda",
+    color: "#8EB69B",
     margin: "0 0 8px",
   },
-  headerSubtitle: { fontSize: "15px", color: "#b0c4d8", margin: 0 },
+  headerSubtitle: { fontSize: "15px", color: "#8EB69B", margin: 0 },
   progressContainer: {
     maxWidth: "700px",
     margin: "25px auto 0",
@@ -655,7 +653,7 @@ const styles = {
     marginBottom: "8px",
   },
   progressFill: {
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     height: "100%",
     borderRadius: "10px",
     transition: "width 0.4s ease",
@@ -694,7 +692,7 @@ const styles = {
     width: "36px",
     height: "36px",
     borderRadius: "50%",
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     display: "flex",
     alignItems: "center",
@@ -706,7 +704,7 @@ const styles = {
     width: "36px",
     height: "36px",
     borderRadius: "50%",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     color: "#ffffff",
     display: "flex",
     alignItems: "center",
@@ -726,7 +724,7 @@ const styles = {
   stepTitle: {
     fontSize: "24px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "8px",
   },
   stepSubtitle: { fontSize: "15px", color: "#888", marginBottom: "30px" },
@@ -734,7 +732,7 @@ const styles = {
   label: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#1a2e4a",
+    color: "#051F20",
     display: "block",
     marginBottom: "8px",
   },
@@ -747,7 +745,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
   },
   select: {
     width: "100%",
@@ -757,7 +755,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     cursor: "pointer",
   },
   twoCol: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" },
@@ -766,7 +764,7 @@ const styles = {
     padding: "10px 18px",
     borderRadius: "25px",
     border: "1.5px solid #e0e9f0",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     color: "#555",
     cursor: "pointer",
     fontSize: "14px",
@@ -775,8 +773,8 @@ const styles = {
   radioBtnActive: {
     padding: "10px 18px",
     borderRadius: "25px",
-    border: "1.5px solid #1a2e4a",
-    backgroundColor: "#1a2e4a",
+    border: "1.5px solid #051F20",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     cursor: "pointer",
     fontSize: "14px",
@@ -784,12 +782,12 @@ const styles = {
   },
   hint: { fontSize: "12px", color: "#888", marginTop: "8px" },
   infoBox: {
-    backgroundColor: "#e8f4fd",
-    border: "1px solid #b3d9f5",
+    backgroundColor: "#DAF1DE",
+    border: "1px solid #DAF1DE",
     padding: "15px",
     borderRadius: "10px",
     fontSize: "14px",
-    color: "#1a2e4a",
+    color: "#051F20",
     lineHeight: "1.6",
   },
 
@@ -804,12 +802,12 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    backgroundColor: "#e8f4fd",
-    border: "1.5px solid #4a9eda",
+    backgroundColor: "#DAF1DE",
+    border: "1.5px solid #8EB69B",
     borderRadius: "25px",
     padding: "6px 12px",
   },
-  countryTagText: { fontSize: "13px", fontWeight: "600", color: "#1a2e4a" },
+  countryTagText: { fontSize: "13px", fontWeight: "600", color: "#051F20" },
   removeCountryBtn: {
     background: "none",
     border: "none",
@@ -824,7 +822,7 @@ const styles = {
   searchInputWrapper: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     border: "1.5px solid #e0e9f0",
     borderRadius: "10px",
     overflow: "hidden",
@@ -864,7 +862,7 @@ const styles = {
 
   // Summary
   summaryBox: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f0faf2",
     border: "1px solid #e0e9f0",
     padding: "20px",
     borderRadius: "12px",
@@ -873,7 +871,7 @@ const styles = {
   summaryTitle: {
     fontSize: "16px",
     fontWeight: "700",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "12px",
   },
   summaryItem: { fontSize: "14px", color: "#444", margin: "0 0 8px" },
@@ -883,9 +881,9 @@ const styles = {
   backBtn: {
     padding: "14px 30px",
     borderRadius: "10px",
-    border: "1.5px solid #1a2e4a",
+    border: "1.5px solid #051F20",
     backgroundColor: "#ffffff",
-    color: "#1a2e4a",
+    color: "#051F20",
     fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
@@ -895,7 +893,7 @@ const styles = {
     padding: "14px 35px",
     borderRadius: "10px",
     border: "none",
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     fontSize: "15px",
     fontWeight: "700",
@@ -906,7 +904,7 @@ const styles = {
     padding: "14px 35px",
     borderRadius: "10px",
     border: "none",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     color: "#ffffff",
     fontSize: "15px",
     fontWeight: "700",

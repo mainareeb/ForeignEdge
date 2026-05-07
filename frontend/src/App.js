@@ -16,8 +16,10 @@ import UserProfile from "./pages/UserProfile/UserProfile";
 import ApplicationTracker from "./pages/Tracker/ApplicationTracker";
 import DeadlineReminders from "./pages/Reminders/DeadlineReminders";
 import SOPHelper from "./pages/SOP/SOPHelper";
+import Recommendations from "./pages/Recommendations/Recommendations";
+import AdminPanel from "./pages/Admin/AdminPanel";
+import RateLimitToast from "./components/RateLimitToast";
 
-// ── Error Boundary ─────────────────────────────────────────────────────────
 class GlobalErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +31,6 @@ class GlobalErrorBoundary extends Component {
   componentDidCatch(error, info) {
     console.error("[ErrorBoundary]", error, info);
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -106,7 +107,6 @@ class GlobalErrorBoundary extends Component {
   }
 }
 
-// ── 404 Page ───────────────────────────────────────────────────────────────
 function NotFound() {
   return (
     <div
@@ -174,10 +174,10 @@ function NotFound() {
   );
 }
 
-// ── App ────────────────────────────────────────────────────────────────────
 function App() {
   return (
     <GlobalErrorBoundary>
+      <RateLimitToast />
       <Router>
         <Routes>
           {/* Public */}
@@ -240,6 +240,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/recommendations"
+            element={
+              <PrivateRoute>
+                <Recommendations />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/admin" element={<AdminPanel />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />

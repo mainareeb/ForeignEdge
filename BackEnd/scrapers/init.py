@@ -6,6 +6,7 @@ from .engine import (
     scrape_accommodation_costs,
     get_exchange_rates,
     get_integrated_country_data,
+    get_country_info,
     _cache_invalidate,
 )
 
@@ -16,5 +17,6 @@ __all__ = [
     "scrape_accommodation_costs",
     "get_exchange_rates",
     "get_integrated_country_data",
+    "get_country_info",
     "_cache_invalidate",
 ]

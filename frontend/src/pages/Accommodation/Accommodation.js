@@ -1,15 +1,16 @@
+import { SkeletonGrid } from "../../components/SkeletonLoader";
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import { getAccommodation } from "../../services/api";
 
 const COUNTRY_META = {
-  UK: { flag: "🇬🇧", name: "United Kingdom", color: "#003087" },
+  UK: { flag: "🇬🇧", name: "United Kingdom", color: "#051F20" },
   USA: { flag: "🇺🇸", name: "United States", color: "#bf0a30" },
   Canada: { flag: "🇨🇦", name: "Canada", color: "#d52b1e" },
   Australia: { flag: "🇦🇺", name: "Australia", color: "#00008b" },
   Germany: { flag: "🇩🇪", name: "Germany", color: "#333" },
   Netherlands: { flag: "🇳🇱", name: "Netherlands", color: "#ae1c28" },
-  Sweden: { flag: "🇸🇪", name: "Sweden", color: "#006aa7" },
+  Sweden: { flag: "🇸🇪", name: "Sweden", color: "#163832" },
   Japan: { flag: "🇯🇵", name: "Japan", color: "#bc002d" },
 };
 
@@ -155,7 +156,7 @@ export default function Accommodation() {
   }, [sel, fetchData]);
 
   const meta = COUNTRY_META[sel] || {};
-  const color = meta.color || "#1a3c5e";
+  const color = meta.color || "#0B2B26";
   const cities = data?.cities || [];
   const costs = data?.costs || {};
   const platforms = PLATFORMS[sel] || [];
@@ -184,7 +185,7 @@ export default function Accommodation() {
 
       <div
         style={{
-          background: "linear-gradient(135deg,#1a3c5e,#2a6496)",
+          background: "linear-gradient(135deg,#0B2B26,#163832)",
           padding: "52px 20px",
           textAlign: "center",
           color: "#fff",
@@ -226,7 +227,7 @@ export default function Accommodation() {
                 padding: "10px 20px",
                 borderRadius: 24,
                 border:
-                  sel === id ? `2px solid ${m.color}` : "1.5px solid #d0dde8",
+                  sel === id ? `2px solid ${m.color}` : "1.5px solid #8EB69B",
                 background: sel === id ? m.color : "#fff",
                 color: sel === id ? "#fff" : "#444",
                 fontWeight: sel === id ? 700 : 400,
@@ -240,11 +241,8 @@ export default function Accommodation() {
 
         {/* Loading */}
         {loading && (
-          <div
-            style={{ textAlign: "center", padding: "60px 0", color: "#555" }}
-          >
-            <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-            <p style={{ fontSize: 16 }}>Loading live data from Numbeo…</p>
+          <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
+            <SkeletonGrid count={3} columns={1} />
           </div>
         )}
 
@@ -328,7 +326,7 @@ export default function Accommodation() {
                       borderRadius: 20,
                       border: !city
                         ? `2px solid ${color}`
-                        : "1.5px solid #d0dde8",
+                        : "1.5px solid #8EB69B",
                       background: !city ? color : "#fff",
                       color: !city ? "#fff" : "#666",
                       fontSize: 13,
@@ -348,7 +346,7 @@ export default function Accommodation() {
                         border:
                           city === c
                             ? `2px solid ${color}`
-                            : "1.5px solid #d0dde8",
+                            : "1.5px solid #8EB69B",
                         background: city === c ? color : "#fff",
                         color: city === c ? "#fff" : "#666",
                         fontSize: 13,
@@ -368,7 +366,7 @@ export default function Accommodation() {
               style={{
                 fontSize: 19,
                 fontWeight: 700,
-                color: "#1a3c5e",
+                color: "#0B2B26",
                 margin: "0 0 16px",
               }}
             >
@@ -391,48 +389,242 @@ export default function Accommodation() {
                     borderRadius: 14,
                     padding: 22,
                     boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-                    borderTop: `3px solid ${color}`,
+                    borderTop: `4px solid ${color}`,
                     animationDelay: `${i * 0.08}s`,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12,
                   }}
                 >
-                  <h3
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: "#1a3c5e",
-                      margin: "0 0 8px",
-                    }}
-                  >
-                    {type}
-                  </h3>
+                  {/* ── Header ── */}
                   <div
                     style={{
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color,
-                      marginBottom: 8,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
                     }}
                   >
-                    {info.range}
+                    <h3
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 800,
+                        color: "#0B2B26",
+                        margin: 0,
+                      }}
+                    >
+                      {type}
+                    </h3>
+                    <span
+                      style={{
+                        background: "#f0f9ff",
+                        color: "#0369a1",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: "3px 8px",
+                        borderRadius: 10,
+                      }}
+                    >
+                      /month
+                    </span>
                   </div>
-                  <div style={{ fontSize: 13, color: "#555", marginBottom: 8 }}>
-                    Avg:{" "}
-                    <strong>
-                      {data.symbol}
-                      {info.avg?.toLocaleString()}/mo
-                    </strong>
-                  </div>
-                  {info.includes && (
-                    <div style={{ fontSize: 12, color: "#555" }}>
-                      <strong>Typically includes:</strong>
-                      <ul style={{ margin: "6px 0 0", paddingLeft: 16 }}>
-                        {info.includes.map((item, j) => (
-                          <li key={j} style={{ marginBottom: 3 }}>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
+
+                  {/* ── Price Range ── */}
+                  <div
+                    style={{
+                      background: "#f8fafc",
+                      borderRadius: 10,
+                      padding: "12px 14px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 11,
+                        color: "#888",
+                        margin: "0 0 4px",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      Price Range
+                    </p>
+                    <div style={{ fontSize: 22, fontWeight: 800, color }}>
+                      {info.range}
                     </div>
+                    <p
+                      style={{ fontSize: 13, color: "#555", margin: "4px 0 0" }}
+                    >
+                      Average:{" "}
+                      <strong>
+                        {data.symbol}
+                        {info.avg?.toLocaleString()}/mo
+                      </strong>
+                    </p>
+                  </div>
+
+                  {/* ── Monthly Budget Breakdown ── */}
+                  {(info.utilities || info.internet || info.transport) && (
+                    <div>
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#888",
+                          margin: "0 0 6px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Monthly Extras
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 4,
+                        }}
+                      >
+                        {info.utilities && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: 12,
+                            }}
+                          >
+                            <span style={{ color: "#555" }}>⚡ Utilities</span>
+                            <span style={{ fontWeight: 600, color: "#333" }}>
+                              {data.symbol}
+                              {info.utilities}/mo
+                            </span>
+                          </div>
+                        )}
+                        {info.internet && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: 12,
+                            }}
+                          >
+                            <span style={{ color: "#555" }}>📶 Internet</span>
+                            <span style={{ fontWeight: 600, color: "#333" }}>
+                              {data.symbol}
+                              {info.internet}/mo
+                            </span>
+                          </div>
+                        )}
+                        {info.transport && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: 12,
+                            }}
+                          >
+                            <span style={{ color: "#555" }}>🚌 Transport</span>
+                            <span style={{ fontWeight: 600, color: "#333" }}>
+                              {data.symbol}
+                              {info.transport}/mo
+                            </span>
+                          </div>
+                        )}
+                        {info.avg && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: 13,
+                              borderTop: "1px solid #e0e9f0",
+                              paddingTop: 4,
+                              marginTop: 2,
+                            }}
+                          >
+                            <span style={{ color: "#051F20", fontWeight: 700 }}>
+                              📊 Total Estimate
+                            </span>
+                            <span style={{ fontWeight: 800, color }}>
+                              {data.symbol}
+                              {(
+                                info.avg +
+                                (info.utilities || 0) +
+                                (info.internet || 0) +
+                                (info.transport || 0)
+                              ).toLocaleString()}
+                              /mo
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Includes ── */}
+                  {info.includes && (
+                    <div>
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#888",
+                          margin: "0 0 6px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Typically Includes
+                      </p>
+                      <div
+                        style={{ display: "flex", gap: 6, flexWrap: "wrap" }}
+                      >
+                        {info.includes.map((item, j) => (
+                          <span
+                            key={j}
+                            style={{
+                              background: "#e8fdf0",
+                              color: "#163832",
+                              fontSize: 11,
+                              padding: "2px 8px",
+                              borderRadius: 10,
+                              fontWeight: 600,
+                            }}
+                          >
+                            ✓ {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Halal Food Note ── */}
+                  {data.halal_food_note && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#163832",
+                        margin: 0,
+                        fontWeight: 600,
+                        background: "#e8fdf0",
+                        padding: "6px 10px",
+                        borderRadius: 8,
+                      }}
+                    >
+                      🕌 {data.halal_food_note}
+                    </p>
+                  )}
+
+                  {/* ── Numbeo Source ── */}
+                  {data.source_url && (
+                    <a
+                      href={data.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: 11,
+                        color: "#0369a1",
+                        textDecoration: "none",
+                        textAlign: "right",
+                      }}
+                    >
+                      📊 View on Numbeo →
+                    </a>
                   )}
                 </div>
               ))}
@@ -459,7 +651,7 @@ export default function Accommodation() {
                   style={{
                     fontSize: 17,
                     fontWeight: 700,
-                    color: "#1a3c5e",
+                    color: "#0B2B26",
                     margin: "0 0 12px",
                   }}
                 >
@@ -488,7 +680,7 @@ export default function Accommodation() {
                         gap: 10,
                         fontWeight: 600,
                         fontSize: 14,
-                        color: "#1a3c5e",
+                        color: "#0B2B26",
                         textAlign: "left",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
                       }}
@@ -526,7 +718,7 @@ export default function Accommodation() {
                   style={{
                     fontWeight: 700,
                     fontSize: 16,
-                    color: "#1a3c5e",
+                    color: "#0B2B26",
                     marginBottom: 4,
                   }}
                 >

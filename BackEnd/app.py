@@ -783,6 +783,128 @@ def admin_get_stats():
         logger.error("Admin stats error: %s", e)
         return jsonify({"error": "Failed to fetch stats"}), 500
 
+# ── Scrap.do Real-time Data ──────────────────────────────────────────────────
+@app.route("/scrape/realtime", methods=["GET"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def scrape_realtime():
+    """
+    Fetch real-time data from external portals via Scrap.do.
+    ?type=daad_scholarships | chevening | germany_universities | accommodation
+    """
+    data_type = request.args.get("type", "")
+    city      = request.args.get("city", "London")
+
+    if not data_type:
+        return jsonify({"error": "type parameter required"}), 400
+
+    # Check cache
+    cache_key = f"scrapdo:{data_type}:{city}"
+    cached = _cache_get(cache_key)
+    if cached:
+        return jsonify(cached), 200
+
+    try:
+        from scrapers.scrapdo_scraper import get_real_time_data
+        result = get_real_time_data(data_type, {"city": city})
+        _cache_set(cache_key, result, ttl=3600)  # cache 1 hour
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error("Scrap.do route error: %s", e)
+        return jsonify({"error": "Failed to fetch real-time data"}), 500
+
+# ── Country Info — RestCountries API ─────────────────────────────────────────
+@app.route("/country-info", methods=["GET"])
+@limiter.limit("30 per minute")
+def country_info():
+    """
+    GET /country-info?country=UK
+    Returns flag, capital, currency, population, languages from RestCountries API.
+    No API key needed — free and unlimited.
+    """
+    country = request.args.get("country", "").strip()
+    if not country:
+        return jsonify({"error": "country parameter required"}), 400
+    try:
+        from scrapers.engine import get_country_info
+        result = get_country_info(country)
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error("Country info error: %s", e)
+        return jsonify({"error": "Failed to fetch country info"}), 500
+
+# ── News API ─────────────────────────────────────────────────────────────────
+@app.route("/news", methods=["GET"])
+@limiter.limit("20 per minute")
+def get_news():
+    """
+    GET /news?topic=scholarships
+    Fetches latest news about study abroad, scholarships, universities.
+    """
+    import requests
+    topic = request.args.get("topic", "scholarships study abroad")
+    
+    cache_key = f"news:{topic}"
+    cached = _cache_get(cache_key)
+    if cached:
+        return jsonify(cached), 200
+
+    api_key = os.getenv("NEWS_API_KEY", "")
+    if not api_key:
+        return jsonify({"error": "NEWS_API_KEY not set"}), 500
+
+    queries = {
+        "scholarships": "scholarships international students 2025",
+        "universities": "university rankings admissions 2025",
+        "study abroad": "study abroad Pakistani students 2025",
+        "accommodation": "student accommodation housing 2025",
+        "visa":         "student visa requirements 2025",
+    }
+
+    query = queries.get(topic, topic)
+
+    try:
+        resp = requests.get(
+            "https://newsapi.org/v2/everything",
+            params={
+                "q":        query,
+                "language": "en",
+                "sortBy":   "publishedAt",
+                "pageSize": 10,
+                "apiKey":   api_key,
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        articles = []
+        for a in data.get("articles", []):
+            if not a.get("title") or a["title"] == "[Removed]":
+                continue
+            articles.append({
+                "title":       a.get("title", ""),
+                "description": a.get("description", ""),
+                "url":         a.get("url", ""),
+                "image":       a.get("urlToImage", ""),
+                "source":      a.get("source", {}).get("name", ""),
+                "published_at": a.get("publishedAt", ""),
+            })
+
+        result = {
+            "topic":       topic,
+            "articles":    articles,
+            "total":       len(articles),
+            "fetched_at":  datetime.datetime.utcnow().isoformat() + "Z",
+            "source":      "NewsAPI",
+        }
+        _cache_set(cache_key, result)
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error("NewsAPI error: %s", e)
+        return jsonify({"error": "Failed to fetch news"}), 500
+
 # ── Health ────────────────────────────────────────────────────────────────────
 @app.route("/health", methods=["GET"])
 def health():

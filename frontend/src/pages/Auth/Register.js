@@ -184,7 +184,7 @@ const styles = {
   leftPanel: {
     flex: 1,
     background:
-      "linear-gradient(135deg, #0f1f35 0%, #1a2e4a 50%, #1e3a5f 100%)",
+      "linear-gradient(135deg, #051F20 0%, #051F20 50%, #0B2B26 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -194,19 +194,19 @@ const styles = {
   brandName: {
     fontSize: "36px",
     fontWeight: "800",
-    color: "#4a9eda",
+    color: "#8EB69B",
     marginBottom: "10px",
   },
   brandTagline: {
     fontSize: "17px",
-    color: "#b0c4d8",
+    color: "#8EB69B",
     marginBottom: "40px",
     lineHeight: "1.6",
   },
   stepsSection: { display: "flex", flexDirection: "column", gap: "18px" },
   stepsTitle: {
     fontSize: "15px",
-    color: "#b0c4d8",
+    color: "#8EB69B",
     marginBottom: "5px",
     fontWeight: "600",
   },
@@ -214,7 +214,7 @@ const styles = {
   stepNum: {
     width: "32px",
     height: "32px",
-    backgroundColor: "#4a9eda",
+    backgroundColor: "#8EB69B",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -250,7 +250,7 @@ const styles = {
   formTitle: {
     fontSize: "30px",
     fontWeight: "800",
-    color: "#1a2e4a",
+    color: "#051F20",
     marginBottom: "8px",
   },
   formSubtitle: { fontSize: "15px", color: "#888" },
@@ -265,7 +265,7 @@ const styles = {
   },
   form: { display: "flex", flexDirection: "column", gap: "18px" },
   inputGroup: { display: "flex", flexDirection: "column", gap: "8px" },
-  label: { fontSize: "14px", fontWeight: "600", color: "#1a2e4a" },
+  label: { fontSize: "14px", fontWeight: "600", color: "#051F20" },
   inputWrapper: {
     display: "flex",
     alignItems: "center",
@@ -292,7 +292,7 @@ const styles = {
     fontSize: "16px",
   },
   registerBtn: {
-    backgroundColor: "#1a2e4a",
+    backgroundColor: "#051F20",
     color: "#ffffff",
     padding: "15px",
     borderRadius: "10px",
@@ -314,7 +314,7 @@ const styles = {
     letterSpacing: "0.5px",
   },
   loginText: { textAlign: "center", fontSize: "14px", color: "#666" },
-  loginLink: { color: "#4a9eda", textDecoration: "none", fontWeight: "700" },
+  loginLink: { color: "#8EB69B", textDecoration: "none", fontWeight: "700" },
 };
 
 export default Register;

@@ -27,7 +27,7 @@ const CSS = `
 @keyframes shimmer  { 0%{background-position:-400px 0}100%{background-position:400px 0} }
 .uni-card { animation:fadeInUp 0.4s ease both; transition:transform 0.25s,box-shadow 0.25s; }
 .uni-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.13)!important; }
-.skel { background:linear-gradient(90deg,#e8eef4 25%,#f4f7fa 50%,#e8eef4 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+.skel { background:linear-gradient(90deg,#f0faf2 25%,#f4f7fa 50%,#f0faf2 75%); background-size:400px 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
 .filter-btn { transition:all 0.2s; cursor:pointer; }
 .filter-btn:hover { transform:translateY(-2px); }
 `;
@@ -129,14 +129,14 @@ export default function Universities() {
       {/* Hero */}
       <div
         style={{
-          background: "linear-gradient(135deg,#1a2e4a,#2a6496)",
+          background: "linear-gradient(135deg,#051F20,#163832)",
           padding: "50px 20px",
           textAlign: "center",
           color: "#fff",
         }}
       >
         <h1 style={{ fontSize: 34, fontWeight: 800, margin: 0 }}>
-          🎓 University Directory
+          University Directory
         </h1>
         <p
           style={{
@@ -157,7 +157,7 @@ export default function Universities() {
               href={source.url}
               target="_blank"
               rel="noreferrer"
-              style={{ color: "#7ec8e3" }}
+              style={{ color: "#8EB69B" }}
             >
               {source.name}
             </a>
@@ -227,7 +227,7 @@ export default function Universities() {
               minWidth: 220,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1.5px solid #d0dde8",
+              border: "1.5px solid #8EB69B",
               fontSize: 15,
               outline: "none",
             }}
@@ -238,7 +238,7 @@ export default function Universities() {
             style={{
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1.5px solid #d0dde8",
+              border: "1.5px solid #8EB69B",
               fontSize: 15,
               background: "#fff",
               cursor: "pointer",
@@ -283,19 +283,21 @@ export default function Universities() {
               marginBottom: 24,
             }}
           >
-            <div style={{ fontSize: 40, marginBottom: 12 }}>⚠️</div>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📡</div>
             <p style={{ color: "#dc2626", fontWeight: 600, margin: 0 }}>
               {error}
             </p>
             <p style={{ color: "#555", marginTop: 8, fontSize: 14 }}>
-              Make sure the backend server is running on port 5000.
+              Universities API (HiPolabs) requires an unrestricted internet
+              connection. Please switch to mobile hotspot or a VPN and try
+              again.
             </p>
             <button
               onClick={fetchData}
               style={{
                 marginTop: 14,
                 padding: "9px 22px",
-                background: "#2a6496",
+                background: "#163832",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -374,7 +376,7 @@ export default function Universities() {
                           width: 44,
                           height: 44,
                           borderRadius: 10,
-                          background: "linear-gradient(135deg,#e8f4fd,#d0e9f8)",
+                          background: "linear-gradient(135deg,#DAF1DE,#DAF1DE)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -384,12 +386,12 @@ export default function Universities() {
                       >
                         🎓
                       </div>
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <h3
                           style={{
                             fontSize: 15,
-                            fontWeight: 700,
-                            color: "#1a2e4a",
+                            fontWeight: 800,
+                            color: "#051F20",
                             margin: 0,
                             lineHeight: 1.3,
                           }}
@@ -409,9 +411,139 @@ export default function Universities() {
                       </div>
                     </div>
 
+                    {/* ── Key Details ── */}
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {uni.ranking && (
+                        <span
+                          style={{
+                            background: "#fff8e6",
+                            color: "#b07d00",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "3px 10px",
+                            borderRadius: 20,
+                          }}
+                        >
+                          QS Rank #{uni.ranking}
+                        </span>
+                      )}
+                      {uni.acceptance_rate && (
+                        <span
+                          style={{
+                            background: "#e8fdf0",
+                            color: "#163832",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "3px 10px",
+                            borderRadius: 20,
+                          }}
+                        >
+                          {uni.acceptance_rate} Acceptance
+                        </span>
+                      )}
+                      {uni.tuition_fee && (
+                        <span
+                          style={{
+                            background: "#fdecea",
+                            color: "#c0392b",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "3px 10px",
+                            borderRadius: 20,
+                          }}
+                        >
+                          {uni.tuition_fee}/yr
+                        </span>
+                      )}
+                      {uni.student_population && (
+                        <span
+                          style={{
+                            background: "#f0faf2",
+                            color: "#444",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            padding: "3px 10px",
+                            borderRadius: 20,
+                          }}
+                        >
+                          {uni.student_population} students
+                        </span>
+                      )}
+                    </div>
+
+                    {/* ── Programs ── */}
+                    {uni.popular_programs &&
+                      uni.popular_programs.length > 0 && (
+                        <div>
+                          <p
+                            style={{
+                              fontSize: 11,
+                              color: "#888",
+                              margin: "0 0 5px",
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            Popular Programs
+                          </p>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            {uni.popular_programs.slice(0, 4).map((prog, i) => (
+                              <span
+                                key={i}
+                                style={{
+                                  background: "#DAF1DE",
+                                  color: "#235347",
+                                  fontSize: 11,
+                                  padding: "2px 8px",
+                                  borderRadius: 10,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {prog}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* ── Application Deadline ── */}
+                    {uni.application_deadline && (
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: "#b07d00",
+                          margin: 0,
+                          fontWeight: 600,
+                        }}
+                      >
+                        Application Deadline: {uni.application_deadline}
+                      </p>
+                    )}
+
+                    {/* ── Domain ── */}
                     {uni.domains?.[0] && (
                       <p style={{ fontSize: 12, color: "#888", margin: 0 }}>
-                        🌐 {uni.domains[0]}
+                        {uni.domains[0]}
+                      </p>
+                    )}
+
+                    {/* ── Scholarship availability ── */}
+                    {uni.scholarships_available && (
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: "#163832",
+                          margin: 0,
+                          fontWeight: 600,
+                        }}
+                      >
+                        Scholarships Available: {uni.scholarships_available}
                       </p>
                     )}
 
@@ -424,7 +556,7 @@ export default function Universities() {
                           style={{
                             flex: 1,
                             padding: "8px 12px",
-                            background: "#2a6496",
+                            background: "#163832",
                             color: "#fff",
                             borderRadius: 8,
                             textDecoration: "none",
@@ -434,7 +566,7 @@ export default function Universities() {
                             display: "block",
                           }}
                         >
-                          Visit Website
+                          🌐 Visit Website
                         </a>
                       )}
                       <button
@@ -447,8 +579,8 @@ export default function Universities() {
                           flex: 1,
                           padding: "8px 12px",
                           background: "#e8fdf0",
-                          border: "1.5px solid #2d7a3a",
-                          color: "#2d7a3a",
+                          border: "1.5px solid #163832",
+                          color: "#163832",
                           borderRadius: 8,
                           fontSize: 13,
                           fontWeight: 600,
@@ -492,7 +624,7 @@ export default function Universities() {
                     style={{
                       padding: "8px 16px",
                       borderRadius: 8,
-                      border: "1.5px solid #d0dde8",
+                      border: "1.5px solid #8EB69B",
                       background: page === 1 ? "#f5f5f5" : "#fff",
                       color: page === 1 ? "#bbb" : "#444",
                       cursor: page === 1 ? "not-allowed" : "pointer",
@@ -512,9 +644,9 @@ export default function Universities() {
                         borderRadius: 8,
                         border:
                           p === page
-                            ? "2px solid #2a6496"
-                            : "1.5px solid #d0dde8",
-                        background: p === page ? "#2a6496" : "#fff",
+                            ? "2px solid #163832"
+                            : "1.5px solid #8EB69B",
+                        background: p === page ? "#163832" : "#fff",
                         color: p === page ? "#fff" : "#444",
                         cursor: "pointer",
                         fontWeight: p === page ? 700 : 400,
@@ -529,7 +661,7 @@ export default function Universities() {
                     style={{
                       padding: "8px 16px",
                       borderRadius: 8,
-                      border: "1.5px solid #d0dde8",
+                      border: "1.5px solid #8EB69B",
                       background: page === pages ? "#f5f5f5" : "#fff",
                       color: page === pages ? "#bbb" : "#444",
                       cursor: page === pages ? "not-allowed" : "pointer",
