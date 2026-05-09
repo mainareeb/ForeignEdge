@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 
@@ -110,6 +110,7 @@ function AcademicProfile() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [countrySearch, setCountrySearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [formData, setFormData] = useState({
@@ -126,6 +127,38 @@ function AcademicProfile() {
     fundingType: "",
     startYear: "",
   });
+
+  // Load saved profile data on mount
+  useEffect(() => {
+    const loadSaved = async () => {
+      try {
+        const res = await API.get("/user/profile");
+        const d = res.data;
+        setFormData((prev) => ({
+          ...prev,
+          degree: d.degree || "",
+          field: d.field || "",
+          gpa: d.gpa || "",
+          gradingSystem: d.gradingSystem || "4.0",
+          ieltsScore: d.ieltsScore || "",
+          toeflScore: d.toeflScore || "",
+          englishTest: d.englishTest || "IELTS",
+          desiredCountries: Array.isArray(d.desiredCountries)
+            ? d.desiredCountries
+            : [],
+          desiredField: d.desiredField || "",
+          budget: d.budget || "",
+          fundingType: d.fundingType || "",
+          startYear: d.startYear || "",
+        }));
+      } catch (e) {
+        // not logged in or no profile yet — start fresh
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+    loadSaved();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -174,6 +207,26 @@ function AcademicProfile() {
       }
     }
   };
+
+  if (profileLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <div style={{ fontSize: 36 }}>⏳</div>
+        <p style={{ color: "#666", fontSize: 15 }}>
+          Loading your saved profile...
+        </p>
+      </div>
+    );
+  }
 
   const handleSubmit = async () => {
     setLoading(true);
