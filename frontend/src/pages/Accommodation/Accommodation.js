@@ -283,7 +283,9 @@ export default function Accommodation() {
                 rel="noreferrer"
                 style={{ color: "#0369a1" }}
               >
-                {data.source}
+                {typeof data.source === "object"
+                  ? data.source?.name || ""
+                  : data.source || ""}
               </a>
               {data.is_fallback && (
                 <span
