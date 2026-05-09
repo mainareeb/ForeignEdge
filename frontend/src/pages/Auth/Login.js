@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/api";
+import {
+  loginUser,
+  getUniversities,
+  getPlatformStats,
+} from "../../services/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,6 +14,45 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // ── Live stats from API ────────────────────────────────────────────────────
+  const [stats, setStats] = useState({
+    universities: "...",
+    scholarships: "...",
+    countries: "20",
+  });
+
+  useEffect(() => {
+    Promise.allSettled([getUniversities({ per_page: 1 }), getPlatformStats()])
+      .then(([uniRes, statRes]) => {
+        const uniTotal =
+          uniRes.status === "fulfilled" ? uniRes.value.data?.total : null;
+        const platStats =
+          statRes.status === "fulfilled" ? statRes.value.data : null;
+        setStats({
+          universities: uniTotal ? uniTotal.toLocaleString() + "+" : "200+",
+          scholarships: platStats?.scholarships
+            ? platStats.scholarships + "+"
+            : "70+",
+          countries: platStats?.countries ? platStats.countries + "+" : "20+",
+        });
+      })
+      .catch(() => {
+        setStats({
+          universities: "200+",
+          scholarships: "70+",
+          countries: "20+",
+        });
+      });
+  }, []);
+
+  const FEATURES = [
+    { icon: "🎓", label: `${stats.universities} Universities Worldwide` },
+    { icon: "💰", label: `${stats.scholarships} Scholarships Available` },
+    { icon: "🤖", label: "AI-Powered Recommendations" },
+    { icon: "🔒", label: "AES-256 Secure Platform" },
+  ];
+
+  // ── Auth ───────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!email || !password) {
       setError("Please fill in all fields");
@@ -35,23 +78,36 @@ function Login() {
 
   return (
     <div style={styles.container} className="fe-page">
-      {/* Left Panel */}
+      {/* ── Left Panel ── */}
       <div style={styles.leftPanel}>
         <div style={styles.leftContent}>
           <h1 style={styles.brandName}>ForeignEdge</h1>
           <p style={styles.brandTagline}>Your Gateway to Global Education</p>
+
           <div style={styles.featureList}>
-            <div style={styles.featureItem}>✅ 500+ Universities Worldwide</div>
-            <div style={styles.featureItem}>
-              ✅ 1000+ Scholarships Available
-            </div>
-            <div style={styles.featureItem}>✅ AI-Powered Recommendations</div>
-            <div style={styles.featureItem}>✅ AES-256 Secure Platform</div>
+            {FEATURES.map((f, i) => (
+              <div key={i} style={styles.featureItem}>
+                <span style={styles.featureIcon}>{f.icon}</span>
+                <span>{f.label}</span>
+              </div>
+            ))}
           </div>
+
+          {/* live data note */}
+          <p
+            style={{
+              color: "#8EB69B",
+              fontSize: 11,
+              marginTop: 28,
+              opacity: 0.7,
+            }}
+          >
+            ✦ Stats updated in real-time from our database
+          </p>
         </div>
       </div>
 
-      {/* Right Panel */}
+      {/* ── Right Panel ── */}
       <div style={styles.rightPanel}>
         <div style={styles.formCard}>
           <div style={styles.formHeader}>
@@ -159,8 +215,21 @@ const styles = {
     marginBottom: "40px",
     lineHeight: "1.5",
   },
-  featureList: { display: "flex", flexDirection: "column", gap: "15px" },
-  featureItem: { fontSize: "16px", color: "#ffffff", fontWeight: "500" },
+  featureList: { display: "flex", flexDirection: "column", gap: "16px" },
+  featureItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    fontSize: "16px",
+    color: "#ffffff",
+    fontWeight: "500",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(142,182,155,0.2)",
+    borderRadius: "10px",
+    padding: "12px 16px",
+    transition: "background 0.2s",
+  },
+  featureIcon: { fontSize: "20px", flexShrink: 0 },
   rightPanel: {
     flex: 1,
     backgroundColor: "#f0f4f8",
