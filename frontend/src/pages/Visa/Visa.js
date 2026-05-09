@@ -361,7 +361,10 @@ export default function Visa() {
               }}
             >
               <span>
-                <strong>Source:</strong> {visa.source}
+                <strong>Source:</strong>{" "}
+                {typeof visa.source === "object"
+                  ? visa.source?.name || ""
+                  : visa.source || ""}
               </span>
               {visa.is_live && (
                 <span
