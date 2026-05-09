@@ -19,12 +19,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all backend files
 COPY . .
 
-# Expose port 5000
-EXPOSE 5000
+# Expose port 8080
+EXPOSE 8080
 
-# Environment variables (override with docker run -e or .env)
+# Environment variables
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
-# Run the app
-CMD ["python", "app.py"]
+# Run with Gunicorn (production WSGI server)
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120"]
