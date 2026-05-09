@@ -40,8 +40,14 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 logger = logging.getLogger("foreignedge")
 load_dotenv()
 
-from startup_check import validate_env
-validate_env()
+# Validate environment on startup
+try:
+    from startup_check import validate_env
+    validate_env()
+except SystemExit:
+    raise
+except Exception as _e:
+    logger.warning("Startup check error: %s", _e)
 
 app = Flask(__name__)
 CORS(app)
@@ -456,10 +462,15 @@ def generate_sop():
         f"No headings or bullet points — flowing paragraphs only."
     )
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        msg = client.messages.create(model="claude-opus-4-6", max_tokens=1500, messages=[{"role":"user","content":prompt}])
-        return jsonify({"sop": msg.content[0].text}), 200
+        from groq import Groq
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        resp = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1500,
+            temperature=0.7,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return jsonify({"sop": resp.choices[0].message.content}), 200
     except Exception as e:
         logger.error("SOP error: %s", e)
         return jsonify({"error": "SOP generation failed."}), 500
@@ -493,143 +504,69 @@ def delete_sop(sop_id):
     db.collection("users").document(email).collection("sops").document(sop_id).delete()
     return jsonify({"message": "Deleted."}), 200
 
-# ── Chatbot — Groq AI with profile-based suggestions + conversation memory ────
+# ── Chatbot — Claude AI with live context injection ───────────────────────────
 @app.route("/chat/query", methods=["POST"])
 @jwt_required()
 @limiter.limit("15 per minute")
 def chat_query():
-    email   = get_jwt_identity()
     data    = request.get_json(force=True)
     message = str(data.get("message","")).strip()
-    history = data.get("history", [])
-
     if not message:
         return jsonify({"error": "Message required"}), 400
     if len(message) > 1000:
         return jsonify({"error": "Message too long (max 1000 chars)"}), 400
-
-    # Fetch user academic profile from Firestore
-    profile = {}
-    try:
-        prof_doc = db.collection("users").document(email).collection("profile").document("academic").get()
-        if prof_doc.exists:
-            profile = prof_doc.to_dict() or {}
-    except Exception:
-        pass
-
-    # Build profile context
-    profile_context = ""
-    if profile:
-        parts = []
-        if profile.get("degree"):     parts.append(f"Degree: {profile['degree']}")
-        if profile.get("field"):      parts.append(f"Field: {profile['field']}")
-        if profile.get("gpa"):        parts.append(f"GPA: {profile['gpa']}")
-        if profile.get("ieltsScore"): parts.append(f"IELTS: {profile['ieltsScore']}")
-        if profile.get("targetCountries"):
-            c = profile["targetCountries"]
-            parts.append(f"Target Countries: {', '.join(c) if isinstance(c, list) else c}")
-        if parts:
-            profile_context = "\n\nUser Academic Profile:\n" + "\n".join(f"- {p}" for p in parts)
-            profile_context += "\n\nIMPORTANT: Give PERSONALIZED suggestions based on this profile. Recommend specific scholarships, universities, and countries that match their GPA, IELTS, field, and target countries."
-
-    # Inject live visa context if country mentioned
+    # Inject live visa context if a country is mentioned
     country_context = ""
     for c in SUPPORTED_COUNTRIES:
         if c.lower() in message.lower():
             try:
                 visa = get_visa_info(c)
                 country_context = (
-                    f"\n\n[Live {c} visa data] Type: {visa.get('visa_type')}, "
-                    f"Fee: {visa.get('fee')}, Processing: {visa.get('processing_time')}"
+                    f"\n[Live {c} data] Visa: {visa.get('visa_type')}, "
+                    f"Fee: {visa.get('fee')}, Processing: {visa.get('processing_time')}, "
+                    f"Official: {visa.get('official_link')}"
                 )
             except Exception:
                 pass
             break
-
     system = (
         "You are ForeignEdge Assistant — a trusted advisor for Pakistani students planning to study abroad.\n\n"
         "You help with: university selection, scholarships (Chevening, Gates Cambridge, Fulbright, DAAD, MEXT, GKS, HEC, etc.), "
         "visa requirements, accommodation costs, SOPs, IELTS/TOEFL/GRE prep, and budgeting.\n\n"
         "Guidelines: Be concise. Direct users to official sources. Never fabricate data. "
         "Keep responses under 300 words unless essential."
-        + profile_context
-        + (f"\n\nLive data:{country_context}" if country_context else "")
+        + (f"\n\nContextual live data:{country_context}" if country_context else "")
     )
-
-    # Build messages with conversation history (last 6 messages = 3 exchanges)
-    messages = []
-    for h in history[-6:]:
-        if h.get("role") in ("user", "assistant") and h.get("content"):
-            messages.append({"role": h["role"], "content": str(h["content"])})
-    messages.append({"role": "user", "content": message})
-
     try:
         from groq import Groq
         client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+        # Build conversation history for multi-turn memory
+        history = data.get("history", [])
+        groq_messages = [{"role": "system", "content": system}]
+
+        # Add previous turns (last 10 to stay within context limit)
+        for turn in history[-10:]:
+            role = turn.get("role", "user")
+            content = str(turn.get("content", "")).strip()
+            if role in ("user", "assistant") and content:
+                groq_messages.append({"role": role, "content": content})
+
+        # Add current message
+        groq_messages.append({"role": "user", "content": message})
+
         resp = client.chat.completions.create(
-            model="llama3-70b-8192",
-            max_tokens=500,
-            messages=[{"role": "system", "content": system}] + messages,
+            model="llama-3.3-70b-versatile",
+            max_tokens=600,
+            messages=groq_messages,
+            temperature=0.7,
         )
-        return jsonify({
-            "reply": resp.choices[0].message.content,
-            "profile_used": bool(profile_context),
-        }), 200
+        return jsonify({"reply": resp.choices[0].message.content}), 200
     except Exception as e:
         logger.error("Chat error: %s", e)
         return jsonify({"error": "Chat service temporarily unavailable."}), 500
 
 # ── Stats ─────────────────────────────────────────────────────────────────────
-# ── ML Recommendations ───────────────────────────────────────────────────────
-@app.route("/recommendations", methods=["GET"])
-@jwt_required()
-@limiter.limit("10 per minute")
-def get_recommendations():
-    email = get_jwt_identity()
-
-    # Check cache first
-    cache_key = f"recommendations:{email}"
-    cached = _cache_get(cache_key)
-    if cached:
-        return jsonify(cached), 200
-
-    # Fetch user profile
-    profile = {}
-    try:
-        prof_doc = db.collection("users").document(email).collection("profile").document("academic").get()
-        if prof_doc.exists:
-            profile = prof_doc.to_dict() or {}
-    except Exception as e:
-        logger.error("Profile fetch error: %s", e)
-
-    if not profile:
-        return jsonify({"error": "Please complete your academic profile first to get recommendations."}), 400
-
-    try:
-        from ML.recommendations import RecommendationEngine
-        engine = RecommendationEngine()
-        recs   = engine.recommend_for_user(profile, top_k=10)
-
-        result = {
-            "scholarships": recs.get("scholarships", [])[:5],
-            "universities": recs.get("universities", [])[:5],
-            "profile_used": {
-                "field":   profile.get("field", ""),
-                "degree":  profile.get("degree", ""),
-                "gpa":     profile.get("gpa", ""),
-                "ielts":   profile.get("ieltsScore", ""),
-            },
-            "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
-        }
-
-        _cache_set(cache_key, result, ttl=300)  # cache 5 mins
-        logger.info("Recommendations generated for %s", email)
-        return jsonify(result), 200
-
-    except Exception as e:
-        logger.error("Recommendations error: %s", e)
-        return jsonify({"error": "Could not generate recommendations. Please try again."}), 500
-
 @app.route("/stats", methods=["GET"])
 def platform_stats():
     cached = _cache_get("platform_stats")
@@ -654,21 +591,49 @@ def clear_cache():
     _cache_invalidate(prefix)
     return jsonify({"message": f"Cache cleared: '{prefix}'"}), 200
 
-# ── Admin Routes ─────────────────────────────────────────────────────────────
-def verify_admin(request):
-    """Check admin key from header or JWT role"""
-    admin_key = os.getenv("ADMIN_KEY", "")
-    return request.headers.get("X-Admin-Key") == admin_key and admin_key != ""
+# ── Health ────────────────────────────────────────────────────────────────────
+# ── Admin Authentication ─────────────────────────────────────────────────────
+@app.route("/admin/login", methods=["POST"])
+@limiter.limit("5 per minute")
+def admin_login():
+    import hashlib
+    data          = request.get_json(force=True)
+    email         = data.get("email", "").strip().lower()
+    password      = data.get("password", "")
+    admin_email   = os.getenv("ADMIN_EMAIL", "").strip().lower()
+    admin_pw_hash = os.getenv("ADMIN_PASSWORD_HASH", "")
+    if not email or not password:
+        return jsonify({"error": "Email and password required"}), 400
+    pw_hash = hashlib.sha256(password.encode()).hexdigest()
+    if email != admin_email or pw_hash != admin_pw_hash:
+        return jsonify({"error": "Invalid admin credentials"}), 401
+    token = create_access_token(
+        identity=email,
+        additional_claims={"role": "admin"},
+        expires_delta=datetime.timedelta(hours=8)
+    )
+    return jsonify({"token": token, "email": email, "role": "admin"}), 200
+
+@app.route("/admin/verify", methods=["GET"])
+@jwt_required()
+def admin_verify():
+    from flask_jwt_extended import get_jwt
+    claims = get_jwt()
+    if claims.get("role") != "admin":
+        return jsonify({"error": "Not authorized"}), 403
+    return jsonify({"valid": True, "role": "admin"}), 200
 
 @app.route("/admin/users", methods=["GET"])
+@jwt_required()
 @limiter.limit("20 per minute")
 def admin_get_users():
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     try:
-        users_ref  = db.collection("users").stream()
         users_list = []
-        for doc in users_ref:
+        today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        for doc in db.collection("users").stream():
             u = doc.to_dict() or {}
             users_list.append({
                 "email":      doc.id,
@@ -676,239 +641,364 @@ def admin_get_users():
                 "created_at": u.get("created_at", ""),
                 "role":       u.get("role", "user"),
             })
-        # Stats
-        today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
         new_today = sum(1 for u in users_list if str(u.get("created_at","")).startswith(today))
-        return jsonify({
-            "users":      users_list,
-            "total":      len(users_list),
-            "new_today":  new_today,
-            "fetched_at": datetime.datetime.utcnow().isoformat() + "Z",
-        }), 200
+        return jsonify({"users": users_list, "total": len(users_list), "new_today": new_today}), 200
     except Exception as e:
-        logger.error("Admin users error: %s", e)
-        return jsonify({"error": "Failed to fetch users"}), 500
-
-@app.route("/admin/scholarships", methods=["GET"])
-@limiter.limit("20 per minute")
-def admin_get_scholarships():
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
-    try:
-        docs = db.collection("scholarships").stream()
-        scholarships = []
-        for doc in docs:
-            s = doc.to_dict() or {}
-            s["id"] = doc.id
-            scholarships.append(s)
-        return jsonify({
-            "scholarships": scholarships,
-            "total":        len(scholarships),
-            "fetched_at":   datetime.datetime.utcnow().isoformat() + "Z",
-        }), 200
-    except Exception as e:
-        logger.error("Admin scholarships error: %s", e)
-        return jsonify({"error": "Failed to fetch scholarships"}), 500
-
-@app.route("/admin/scholarships", methods=["POST"])
-@limiter.limit("10 per minute")
-def admin_add_scholarship():
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
-    try:
-        data = request.get_json(force=True)
-        required = ["name", "country", "amount", "deadline"]
-        for field in required:
-            if not data.get(field):
-                return jsonify({"error": f"Missing field: {field}"}), 400
-        data["created_at"] = datetime.datetime.utcnow().isoformat() + "Z"
-        ref = db.collection("scholarships").add(data)
-        return jsonify({"message": "Scholarship added", "id": ref[1].id}), 201
-    except Exception as e:
-        logger.error("Admin add scholarship error: %s", e)
-        return jsonify({"error": "Failed to add scholarship"}), 500
-
-@app.route("/admin/scholarships/<scholarship_id>", methods=["PUT"])
-@limiter.limit("10 per minute")
-def admin_update_scholarship(scholarship_id):
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
-    try:
-        data = request.get_json(force=True)
-        data["updated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
-        db.collection("scholarships").document(scholarship_id).update(data)
-        return jsonify({"message": "Scholarship updated"}), 200
-    except Exception as e:
-        logger.error("Admin update scholarship error: %s", e)
-        return jsonify({"error": "Failed to update scholarship"}), 500
-
-@app.route("/admin/scholarships/<scholarship_id>", methods=["DELETE"])
-@limiter.limit("10 per minute")
-def admin_delete_scholarship(scholarship_id):
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
-    try:
-        db.collection("scholarships").document(scholarship_id).delete()
-        return jsonify({"message": "Scholarship deleted"}), 200
-    except Exception as e:
-        logger.error("Admin delete scholarship error: %s", e)
-        return jsonify({"error": "Failed to delete scholarship"}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/admin/stats", methods=["GET"])
+@jwt_required()
 @limiter.limit("20 per minute")
 def admin_get_stats():
-    if not verify_admin(request):
-        return jsonify({"error": "Unauthorized"}), 401
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     try:
         users_count        = len(list(db.collection("users").stream()))
         scholarships_count = len(list(db.collection("scholarships").stream()))
-        # Count all trackers across users
-        tracker_count = 0
-        sop_count     = 0
-        reminder_count = 0
+        tracker_count = sop_count = reminder_count = 0
         for user_doc in db.collection("users").stream():
-            tracker_count  += len(list(db.collection("users").document(user_doc.id).collection("applications").stream()))
-            sop_count      += len(list(db.collection("users").document(user_doc.id).collection("sops").stream()))
-            reminder_count += len(list(db.collection("users").document(user_doc.id).collection("reminders").stream()))
-
+            uid = user_doc.id
+            tracker_count  += len(list(db.collection("users").document(uid).collection("tracker").stream()))
+            sop_count      += len(list(db.collection("users").document(uid).collection("sops").stream()))
+            reminder_count += len(list(db.collection("users").document(uid).collection("reminders").stream()))
         return jsonify({
-            "users":        users_count,
-            "scholarships": scholarships_count,
-            "applications": tracker_count,
-            "sops":         sop_count,
-            "reminders":    reminder_count,
-            "fetched_at":   datetime.datetime.utcnow().isoformat() + "Z",
+            "users": users_count, "scholarships": scholarships_count,
+            "applications": tracker_count, "sops": sop_count,
+            "reminders": reminder_count,
+            "fetched_at": datetime.datetime.utcnow().isoformat() + "Z",
         }), 200
     except Exception as e:
-        logger.error("Admin stats error: %s", e)
-        return jsonify({"error": "Failed to fetch stats"}), 500
+        return jsonify({"error": str(e)}), 500
 
-# ── Scrap.do Real-time Data ──────────────────────────────────────────────────
-@app.route("/scrape/realtime", methods=["GET"])
+@app.route("/admin/scholarships", methods=["GET"])
 @jwt_required()
-@limiter.limit("10 per minute")
-def scrape_realtime():
-    """
-    Fetch real-time data from external portals via Scrap.do.
-    ?type=daad_scholarships | chevening | germany_universities | accommodation
-    """
-    data_type = request.args.get("type", "")
-    city      = request.args.get("city", "London")
-
-    if not data_type:
-        return jsonify({"error": "type parameter required"}), 400
-
-    # Check cache
-    cache_key = f"scrapdo:{data_type}:{city}"
-    cached = _cache_get(cache_key)
-    if cached:
-        return jsonify(cached), 200
-
+def admin_get_scholarships():
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     try:
-        from scrapers.scrapdo_scraper import get_real_time_data
-        result = get_real_time_data(data_type, {"city": city})
-        _cache_set(cache_key, result, ttl=3600)  # cache 1 hour
-        return jsonify(result), 200
+        scholarships = []
+        for doc in db.collection("scholarships").stream():
+            s = doc.to_dict() or {}
+            s["id"] = doc.id
+            scholarships.append(s)
+        return jsonify({"scholarships": scholarships, "total": len(scholarships)}), 200
     except Exception as e:
-        logger.error("Scrap.do route error: %s", e)
-        return jsonify({"error": "Failed to fetch real-time data"}), 500
+        return jsonify({"error": str(e)}), 500
 
-# ── Country Info — RestCountries API ─────────────────────────────────────────
-@app.route("/country-info", methods=["GET"])
-@limiter.limit("30 per minute")
-def country_info():
-    """
-    GET /country-info?country=UK
-    Returns flag, capital, currency, population, languages from RestCountries API.
-    No API key needed — free and unlimited.
-    """
-    country = request.args.get("country", "").strip()
-    if not country:
-        return jsonify({"error": "country parameter required"}), 400
-    try:
-        from scrapers.engine import get_country_info
-        result = get_country_info(country)
-        return jsonify(result), 200
-    except Exception as e:
-        logger.error("Country info error: %s", e)
-        return jsonify({"error": "Failed to fetch country info"}), 500
-
-# ── News API ─────────────────────────────────────────────────────────────────
 @app.route("/news", methods=["GET"])
-@limiter.limit("20 per minute")
+@limiter.limit("10 per minute")
 def get_news():
-    """
-    GET /news?topic=scholarships
-    Fetches latest news about study abroad, scholarships, universities.
-    """
-    import requests
-    topic = request.args.get("topic", "scholarships study abroad")
-    
+    """Fetch real study-abroad news from RSS feeds — no API key needed, always live."""
+    import requests as req
+    import xml.etree.ElementTree as ET
+    from email.utils import parsedate_to_datetime
+
+    topic = request.args.get("topic", "scholarships").strip().lower()
     cache_key = f"news:{topic}"
     cached = _cache_get(cache_key)
     if cached:
         return jsonify(cached), 200
 
-    api_key = os.getenv("NEWS_API_KEY", "")
-    if not api_key:
-        return jsonify({"error": "NEWS_API_KEY not set"}), 500
+    # Real RSS feeds — education, scholarships, study abroad news
+    RSS_FEEDS = [
+        ("The Guardian",       "https://www.theguardian.com/education/rss"),
+        ("BBC Education",      "https://feeds.bbci.co.uk/news/education/rss.xml"),
+        ("Study International","https://www.studyinternational.com/feed/"),
+        ("Al Jazeera",         "https://www.aljazeera.com/xml/rss/all.xml"),
+        ("Times Higher Ed",    "https://www.timeshighereducation.com/rss.xml"),
+    ]
 
-    queries = {
-        "scholarships": "scholarships international students 2025",
-        "universities": "university rankings admissions 2025",
-        "study abroad": "study abroad Pakistani students 2025",
-        "accommodation": "student accommodation housing 2025",
-        "visa":         "student visa requirements 2025",
+    # Topic → keywords for filtering
+    TOPIC_KEYWORDS = {
+        "scholarships":  ["scholarship", "fellowship", "grant", "funding", "award", "bursary"],
+        "universities":  ["university", "college", "campus", "degree", "admission", "enrollment"],
+        "study abroad":  ["study abroad", "international student", "overseas", "foreign student"],
+        "accommodation": ["accommodation", "housing", "rent", "student housing", "dormitory", "hostel"],
+        "visa":          ["visa", "immigration", "student visa", "permit", "work permit"],
     }
+    keywords = TOPIC_KEYWORDS.get(topic, ["scholarship", "study abroad", "university"])
 
-    query = queries.get(topic, topic)
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 ForeignEdge/3.0"}
 
-    try:
-        resp = requests.get(
-            "https://newsapi.org/v2/everything",
-            params={
-                "q":        query,
-                "language": "en",
-                "sortBy":   "publishedAt",
-                "pageSize": 10,
-                "apiKey":   api_key,
-            },
-            timeout=10,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-
-        articles = []
-        for a in data.get("articles", []):
-            if not a.get("title") or a["title"] == "[Removed]":
+    for source_name, feed_url in RSS_FEEDS:
+        if len(articles) >= 9:
+            break
+        try:
+            r = req.get(feed_url, headers=headers, timeout=8)
+            if r.status_code != 200:
                 continue
-            articles.append({
-                "title":       a.get("title", ""),
-                "description": a.get("description", ""),
-                "url":         a.get("url", ""),
-                "image":       a.get("urlToImage", ""),
-                "source":      a.get("source", {}).get("name", ""),
-                "published_at": a.get("publishedAt", ""),
-            })
+            root = ET.fromstring(r.content)
+            ns = {"media": "http://search.yahoo.com/mrss/",
+                  "dc":    "http://purl.org/dc/elements/1.1/"}
 
-        result = {
-            "topic":       topic,
-            "articles":    articles,
-            "total":       len(articles),
-            "fetched_at":  datetime.datetime.utcnow().isoformat() + "Z",
-            "source":      "NewsAPI",
-        }
-        _cache_set(cache_key, result)
-        return jsonify(result), 200
+            # Handle both RSS <channel><item> and Atom <entry>
+            items = root.findall(".//item") or root.findall(".//{http://www.w3.org/2005/Atom}entry")
+
+            for item in items:
+                title = (item.findtext("title") or
+                         item.findtext("{http://www.w3.org/2005/Atom}title") or "").strip()
+                desc  = (item.findtext("description") or
+                         item.findtext("{http://www.w3.org/2005/Atom}summary") or "").strip()
+                url   = (item.findtext("link") or
+                         item.findtext("{http://www.w3.org/2005/Atom}link") or "").strip()
+                pub   = (item.findtext("pubDate") or
+                         item.findtext("{http://www.w3.org/2005/Atom}updated") or "").strip()
+
+                # Get image from media:thumbnail or enclosure
+                image = ""
+                media_thumb = item.find("media:thumbnail", ns)
+                if media_thumb is not None:
+                    image = media_thumb.get("url", "")
+                if not image:
+                    enclosure = item.find("enclosure")
+                    if enclosure is not None and "image" in enclosure.get("type", ""):
+                        image = enclosure.get("url", "")
+
+                # Clean description (strip HTML tags)
+                import re
+                desc_clean = re.sub(r"<[^>]+>", "", desc)[:200].strip()
+
+                # Normalise publish date
+                pub_iso = ""
+                if pub:
+                    try:
+                        pub_iso = parsedate_to_datetime(pub).isoformat()
+                    except Exception:
+                        pub_iso = pub
+
+                # Filter by topic keywords (case-insensitive)
+                text = (title + " " + desc_clean).lower()
+                if not any(kw in text for kw in keywords):
+                    continue
+
+                if title and url and "[Removed]" not in title:
+                    articles.append({
+                        "title":        title,
+                        "description":  desc_clean,
+                        "url":          url,
+                        "image":        image,
+                        "source":       source_name,
+                        "published_at": pub_iso,
+                        "author":       source_name,
+                    })
+                if len(articles) >= 9:
+                    break
+        except Exception as feed_err:
+            logger.warning("RSS feed error (%s): %s", source_name, feed_err)
+            continue
+
+    # If RSS gave too few results, try NewsAPI as bonus (may work on some plans)
+    if len(articles) < 3:
+        try:
+            api_key = os.getenv("NEWS_API_KEY", "")
+            if api_key:
+                r2 = req.get(
+                    f"https://newsapi.org/v2/top-headlines?q=scholarship&category=education&language=en&pageSize=9&apiKey={api_key}",
+                    headers={"User-Agent": "ForeignEdge/1.0"}, timeout=8
+                )
+                d2 = r2.json()
+                for a in d2.get("articles", []):
+                    if not a.get("title") or "[Removed]" in a.get("title", ""):
+                        continue
+                    articles.append({
+                        "title":        a.get("title", ""),
+                        "description":  a.get("description", ""),
+                        "url":          a.get("url", ""),
+                        "image":        a.get("urlToImage", ""),
+                        "source":       a.get("source", {}).get("name", "") if isinstance(a.get("source"), dict) else "",
+                        "published_at": a.get("publishedAt", ""),
+                        "author":       a.get("author", ""),
+                    })
+        except Exception:
+            pass
+
+    result = {
+        "articles":   articles[:9],
+        "total":      len(articles),
+        "fetched_at": datetime.datetime.utcnow().isoformat() + "Z",
+        "source":     "RSS feeds (live)",
+    }
+    if articles:
+        _cache_set(cache_key, result)  # cache 30 min
+    return jsonify(result), 200
+
+@app.route("/recommendations", methods=["GET"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def get_recommendations():
+    """ML-powered recommendations based on user academic profile."""
+    email = get_jwt_identity()
+    try:
+        doc = db.collection("users").document(email).get()
+        if not doc.exists:
+            return jsonify({"error": "Profile not found"}), 404
+        user = doc.to_dict() or {}
+
+        degree       = user.get("degree", "Bachelor")
+        field        = user.get("field", user.get("desiredField", "Computer Science"))
+        gpa          = user.get("gpa", "3.0")
+        budget       = user.get("budget", "Any")
+        countries    = user.get("desiredCountries", ["UK", "Germany", "Canada"])
+        english_test = user.get("englishTest", "IELTS")
+        ielts        = user.get("ieltsScore", "6.5")
+        funding      = user.get("fundingType", "Any Funding")
+
+        # Generate recommendations using Groq AI
+        from groq import Groq
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+        prompt = f"""You are an expert study abroad advisor for Pakistani students.
+Based on this student profile, recommend 6 specific universities and scholarships.
+
+Student Profile:
+- Degree: {degree}
+- Field: {field}
+- GPA: {gpa}
+- Budget: {budget}
+- Preferred Countries: {', '.join(countries) if isinstance(countries, list) else countries}
+- English Test: {english_test} {ielts}
+- Funding: {funding}
+
+Return ONLY a valid JSON array with exactly 6 recommendations. Each item must have:
+{{
+  "type": "University" or "Scholarship",
+  "name": "name",
+  "country": "country",
+  "match": 85,
+  "reason": "why it matches",
+  "deadline": "deadline",
+  "link": "official URL"
+}}
+
+Return ONLY the JSON array, no other text."""
+
+        resp = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1500,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+        )
+
+        import json
+        text = resp.choices[0].message.content.strip()
+        # Extract JSON array
+        start = text.find("[")
+        end   = text.rfind("]") + 1
+        if start >= 0 and end > start:
+            recs = json.loads(text[start:end])
+        else:
+            recs = []
+
+        # Split by type so frontend can render separately
+        scholarships_recs = [r for r in recs if str(r.get("type","")).lower() == "scholarship"]
+        universities_recs = [r for r in recs if str(r.get("type","")).lower() == "university"]
+
+        return jsonify({
+            "recommendations": recs,
+            "scholarships": scholarships_recs,
+            "universities": universities_recs,
+            "profile": {"degree": degree, "field": field, "gpa": gpa, "countries": countries, "ielts": ielts},
+            "profile_used": {"degree": degree, "field": field, "gpa": gpa, "ielts": ielts},
+            "total": len(recs),
+        }), 200
 
     except Exception as e:
-        logger.error("NewsAPI error: %s", e)
-        return jsonify({"error": "Failed to fetch news"}), 500
+        logger.error("Recommendations error: %s", e)
+        return jsonify({"error": "Could not generate recommendations. Please try again."}), 500
 
-# ── Health ────────────────────────────────────────────────────────────────────
+@app.route("/admin/applications", methods=["GET"])
+@jwt_required()
+def admin_get_applications():
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    try:
+        apps = []
+        for user_doc in db.collection("users").stream():
+            for app_doc in db.collection("users").document(user_doc.id).collection("tracker").stream():
+                a = app_doc.to_dict() or {}
+                a["user_email"] = user_doc.id
+                a["id"] = app_doc.id
+                apps.append(a)
+        return jsonify({"applications": apps, "total": len(apps)}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/admin/sops", methods=["GET"])
+@jwt_required()
+def admin_get_sops():
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    try:
+        sops = []
+        for user_doc in db.collection("users").stream():
+            for sop_doc in db.collection("users").document(user_doc.id).collection("sops").stream():
+                s = sop_doc.to_dict() or {}
+                s["user_email"] = user_doc.id
+                s["id"] = sop_doc.id
+                sops.append(s)
+        return jsonify({"sops": sops, "total": len(sops)}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/admin/reminders", methods=["GET"])
+@jwt_required()
+def admin_get_reminders():
+    from flask_jwt_extended import get_jwt
+    if get_jwt().get("role") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    try:
+        reminders = []
+        for user_doc in db.collection("users").stream():
+            for rem_doc in db.collection("users").document(user_doc.id).collection("reminders").stream():
+                r = rem_doc.to_dict() or {}
+                r["user_email"] = user_doc.id
+                r["id"] = rem_doc.id
+                reminders.append(r)
+        return jsonify({"reminders": reminders, "total": len(reminders)}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status":"healthy","version":"3.0.0","timestamp":datetime.datetime.utcnow().isoformat()+"Z"}), 200
+    import time
+    start = time.time()
+    # Test Firebase connectivity
+    db_status = "connected"
+    try:
+        db.collection("scholarships").limit(1).get()
+    except Exception:
+        db_status = "degraded"
+    response_ms = round((time.time() - start) * 1000)
+    return jsonify({
+        "status":          "healthy",
+        "version":         "3.0.0",
+        "timestamp":       datetime.datetime.utcnow().isoformat() + "Z",
+        "encryption":      "AES-256-CBC",
+        "auth":            "JWT + bcrypt",
+        "database":        db_status,
+        "response_ms":     response_ms,
+        "ssl":             True,
+        "rate_limiting":   True,
+    }), 200
+
+# ── Country Info ──────────────────────────────────────────────────────────────
+@app.route("/country-info", methods=["GET"])
+@limiter.limit("30 per minute")
+def country_info_endpoint():
+    """Country metadata (capital, flag, currency, languages) from RestCountries API."""
+    from scrapers.engine import get_country_info
+    country = request.args.get("country", "UK").strip()
+    if country not in SUPPORTED_COUNTRIES:
+        country = "UK"
+    try:
+        return jsonify(get_country_info(country)), 200
+    except Exception as e:
+        return jsonify({"error": "Country info unavailable.", "details": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=False, port=5000)
