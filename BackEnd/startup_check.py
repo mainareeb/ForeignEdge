@@ -11,9 +11,11 @@ REQUIRED_VARS = [
     ("SECRET_KEY",            "CRITICAL", "Flask secret key"),
     ("JWT_SECRET_KEY",        "CRITICAL", "JWT signing secret"),
     ("AES_KEY",               "CRITICAL", "AES encryption key (must be 32 chars)"),
-    ("GROQ_API_KEY",          "CRITICAL", "Groq API key (chatbot + SOP)"),
+    ("GROQ_API_KEY",          "CRITICAL", "Groq API key (chatbot + recommendations)"),
+    ("ANTHROPIC_API_KEY",     "WARNING",  "Anthropic API key (optional — SOP uses Groq by default)"),
     ("ADMIN_KEY",             "WARNING",  "Admin route protection key"),
     ("SENDGRID_API_KEY",      "WARNING",  "SendGrid key for email reminders"),
+    ("NEWS_API_KEY",          "WARNING",  "NewsAPI key for news section"),
 ]
 
 def validate_env():
