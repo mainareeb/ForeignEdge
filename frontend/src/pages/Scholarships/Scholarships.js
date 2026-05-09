@@ -794,7 +794,9 @@ export default function Scholarships() {
                         paddingTop: 8,
                       }}
                     >
-                      {sch.source}
+                      {typeof sch.source === "object"
+                        ? sch.source?.name || ""
+                        : sch.source || ""}
                     </p>
                   )}
                 </div>
