@@ -1,4 +1,3 @@
-# ForeignEdge Scrapers Package
 from .engine import (
     scrape_universities,
     get_scholarships_from_db,
