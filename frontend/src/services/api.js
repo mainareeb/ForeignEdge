@@ -149,6 +149,13 @@ export const chatQuery = (data) =>
 export const getCountryInfo = (country) =>
   API.get("/country-info", { params: { country } });
 
+// ── Recommendations ────────────────────────────────────────────────────────
+export const getRecommendations = () => API.get("/recommendations");
+
+// ── News ───────────────────────────────────────────────────────────────────
+export const getNews = (topic = "study abroad scholarships") =>
+  API.get("/news", { params: { topic } });
+
 // ── Stats ──────────────────────────────────────────────────────────────────
 export const getPlatformStats = () => API.get("/stats");
 
