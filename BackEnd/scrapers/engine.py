@@ -39,6 +39,7 @@ CACHE_TTL = {
     "accommodation":  3600 * 4,   # 4 hours  — Numbeo updates daily
     "exchange_rates": 3600 * 1,   # 1 hour   — volatile
     "countries":      3600 * 24,  # 24 hours — very stable
+    "news":           1800,        # 30 min   — news updates frequently
     "default":        3600,
 }
 
