@@ -209,16 +209,23 @@ function Home() {
     fetchDestCounts();
   }, [fetchLiveStats, fetchDestCounts]);
 
-  // Fetch news on tab change
+  // Fetch news on tab change - using axios instance for proper error handling
   useEffect(() => {
     setNewsLoading(true);
-    fetch(process.env.REACT_APP_API_URL + "/news?topic=" + newsTab)
-      .then((r) => r.json())
+    const baseUrl = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
+    fetch(baseUrl + "/news?topic=" + encodeURIComponent(newsTab))
+      .then((r) => {
+        if (!r.ok) throw new Error("Network error");
+        return r.json();
+      })
       .then((data) => {
         setNews(data.articles || []);
         setNewsLoading(false);
       })
-      .catch(() => setNewsLoading(false));
+      .catch(() => {
+        setNews([]);
+        setNewsLoading(false);
+      });
   }, [newsTab]);
 
   const stats = [
@@ -251,42 +258,42 @@ function Home() {
   const features = [
     {
       icon: "",
-      title: "University Recommendations",
+      title: "🎓 University Recommendations",
       desc: "AI-powered recommendations based on your academic profile, GPA, and preferences.",
       color: "#DAF1DE",
       accent: "#8EB69B",
     },
     {
       icon: "",
-      title: "Scholarship Search",
+      title: "💰 Scholarship Search",
       desc: "Find fully funded and partial scholarships that match your background and needs.",
       color: "#e8fdf0",
       accent: "#163832",
     },
     {
       icon: "",
-      title: "Visa Guidance",
+      title: "📋 Visa Guidance",
       desc: "Step-by-step visa process guidance for UK, USA, Canada, Germany and Australia.",
       color: "#fdf8e8",
       accent: "#b8860b",
     },
     {
       icon: "",
-      title: "AI Chatbot",
+      title: "🤖 AI Chatbot",
       desc: "Get instant answers to all your study abroad questions 24/7.",
       color: "#fde8f4",
       accent: "#9b2d7a",
     },
     {
       icon: "",
-      title: "Secure Platform",
+      title: "🔐 Secure Platform",
       desc: "Your data is protected with AES-256 encryption and JWT authentication.",
       color: "#DAF1DE",
       accent: "#163832",
     },
     {
       icon: "",
-      title: "Global Network",
+      title: "🌍 Global Network",
       desc: "Connect with students and universities from over 50 countries worldwide.",
       color: "#fde8e8",
       accent: "#cc2200",
@@ -761,7 +768,9 @@ function Home() {
                           textTransform: "uppercase",
                         }}
                       >
-                        {article.source}
+                        {typeof article.source === "object"
+                          ? article.source?.name || ""
+                          : article.source || ""}
                       </p>
                       <p
                         style={{
