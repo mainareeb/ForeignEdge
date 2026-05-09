@@ -1000,5 +1000,7 @@ def country_info_endpoint():
     except Exception as e:
         return jsonify({"error": "Country info unavailable.", "details": str(e)}), 500
 
+# ── FIXED: Use Railway's PORT env variable and bind to 0.0.0.0 ───────────────
 if __name__ == "__main__":
-    app.run(debug=False, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", debug=False, port=port)
