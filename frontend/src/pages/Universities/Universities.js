@@ -601,7 +601,10 @@ export default function Universities() {
                           paddingTop: 8,
                         }}
                       >
-                        📡 {uni.source}
+                        📡{" "}
+                        {typeof uni.source === "object"
+                          ? uni.source?.name || ""
+                          : uni.source || ""}
                       </p>
                     )}
                   </div>
