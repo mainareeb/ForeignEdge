@@ -4,14 +4,26 @@ import Navbar from "../../components/Navbar";
 import { getAccommodation } from "../../services/api";
 
 const COUNTRY_META = {
-  UK: { flag: "🇬🇧", name: "United Kingdom", color: "#051F20" },
-  USA: { flag: "🇺🇸", name: "United States", color: "#bf0a30" },
-  Canada: { flag: "🇨🇦", name: "Canada", color: "#d52b1e" },
-  Australia: { flag: "🇦🇺", name: "Australia", color: "#00008b" },
-  Germany: { flag: "🇩🇪", name: "Germany", color: "#333" },
-  Netherlands: { flag: "🇳🇱", name: "Netherlands", color: "#ae1c28" },
-  Sweden: { flag: "🇸🇪", name: "Sweden", color: "#163832" },
-  Japan: { flag: "🇯🇵", name: "Japan", color: "#bc002d" },
+  UK: { flag: "🇬🇧", name: "United Kingdom" },
+  USA: { flag: "🇺🇸", name: "United States" },
+  Canada: { flag: "🇨🇦", name: "Canada" },
+  Australia: { flag: "🇦🇺", name: "Australia" },
+  Germany: { flag: "🇩🇪", name: "Germany" },
+  Netherlands: { flag: "🇳🇱", name: "Netherlands" },
+  Sweden: { flag: "🇸🇪", name: "Sweden" },
+  France: { flag: "🇫🇷", name: "France" },
+  Japan: { flag: "🇯🇵", name: "Japan" },
+  "South Korea": { flag: "🇰🇷", name: "South Korea" },
+  China: { flag: "🇨🇳", name: "China" },
+  Turkey: { flag: "🇹🇷", name: "Turkey" },
+  Malaysia: { flag: "🇲🇾", name: "Malaysia" },
+  Singapore: { flag: "🇸🇬", name: "Singapore" },
+  "New Zealand": { flag: "🇳🇿", name: "New Zealand" },
+  Switzerland: { flag: "🇨🇭", name: "Switzerland" },
+  Finland: { flag: "🇫🇮", name: "Finland" },
+  Norway: { flag: "🇳🇴", name: "Norway" },
+  Italy: { flag: "🇮🇹", name: "Italy" },
+  Ireland: { flag: "🇮🇪", name: "Ireland" },
 };
 
 const PLATFORMS = {
@@ -131,6 +143,7 @@ const CSS = `
 
 export default function Accommodation() {
   const [sel, setSel] = useState("UK");
+  const [countrySearch, setCountrySearch] = useState("");
   const [city, setCity] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -209,34 +222,130 @@ export default function Accommodation() {
       </div>
 
       <div style={{ maxWidth: 1150, margin: "0 auto", padding: "32px 20px" }}>
-        {/* Country tabs */}
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            flexWrap: "wrap",
-            marginBottom: 28,
-          }}
-        >
-          {Object.entries(COUNTRY_META).map(([id, m]) => (
-            <button
-              key={id}
-              className="country-tab"
-              onClick={() => setSel(id)}
+        {/* Country Search Bar */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ position: "relative", maxWidth: 440 }}>
+            <input
+              type="text"
+              placeholder="🔍  Search country... e.g. Germany, Japan, Canada"
+              value={countrySearch}
+              onChange={(e) => setCountrySearch(e.target.value)}
+              onFocus={() => setCountrySearch(countrySearch)}
               style={{
-                padding: "10px 20px",
-                borderRadius: 24,
-                border:
-                  sel === id ? `2px solid ${m.color}` : "1.5px solid #8EB69B",
-                background: sel === id ? m.color : "#fff",
-                color: sel === id ? "#fff" : "#444",
-                fontWeight: sel === id ? 700 : 400,
+                width: "100%",
+                padding: "13px 16px",
+                border: "2px solid #8EB69B",
+                borderRadius: 12,
                 fontSize: 14,
+                outline: "none",
+                boxSizing: "border-box",
+                background: "#fff",
+                fontFamily: "inherit",
+              }}
+            />
+            {countrySearch.trim() && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 4px)",
+                  left: 0,
+                  right: 0,
+                  background: "#fff",
+                  border: "1.5px solid #8EB69B",
+                  borderRadius: 10,
+                  zIndex: 200,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  maxHeight: 260,
+                  overflowY: "auto",
+                }}
+              >
+                {Object.entries(COUNTRY_META)
+                  .filter(
+                    ([id, m]) =>
+                      id.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                      m.name
+                        .toLowerCase()
+                        .includes(countrySearch.toLowerCase()),
+                  )
+                  .map(([id, m]) => (
+                    <div
+                      key={id}
+                      onClick={() => {
+                        setSel(id);
+                        setCountrySearch("");
+                      }}
+                      style={{
+                        padding: "11px 16px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        background: sel === id ? "#f0faf2" : "transparent",
+                        borderBottom: "0.5px solid #f5f5f5",
+                        fontSize: 14,
+                        fontWeight: sel === id ? 700 : 400,
+                      }}
+                    >
+                      <span style={{ fontSize: 22 }}>{m.flag}</span>
+                      <span style={{ color: "#051F20" }}>{m.name}</span>
+                      {sel === id && (
+                        <span
+                          style={{
+                            marginLeft: "auto",
+                            color: "#059669",
+                            fontSize: 16,
+                          }}
+                        >
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                {Object.entries(COUNTRY_META).filter(
+                  ([id, m]) =>
+                    id.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                    m.name.toLowerCase().includes(countrySearch.toLowerCase()),
+                ).length === 0 && (
+                  <div
+                    style={{
+                      padding: "14px 16px",
+                      color: "#999",
+                      fontSize: 13,
+                    }}
+                  >
+                    No country found. Supported: UK, USA, Canada, Germany and 16
+                    more.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {/* Selected country display */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginTop: 14,
+            }}
+          >
+            <span style={{ fontSize: 26 }}>{COUNTRY_META[sel]?.flag}</span>
+            <span style={{ fontWeight: 700, fontSize: 17, color: "#051F20" }}>
+              {COUNTRY_META[sel]?.name || sel}
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                color: "#059669",
+                background: "#f0faf2",
+                padding: "3px 10px",
+                borderRadius: 20,
+                fontWeight: 600,
               }}
             >
-              {m.flag} {id}
-            </button>
-          ))}
+              Selected
+            </span>
+          </div>
         </div>
 
         {/* Loading */}
