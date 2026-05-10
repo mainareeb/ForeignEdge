@@ -190,6 +190,15 @@ function Home() {
   }, []);
 
   const fetchDestCounts = useCallback(async () => {
+    // Cache in sessionStorage to avoid 6 API calls on every visit
+    const cached = sessionStorage.getItem("fe_dest_counts");
+    if (cached) {
+      try {
+        setDestCounts(JSON.parse(cached));
+        return;
+      } catch {}
+    }
+    // Fetch all 6 in parallel
     const countries = ["UK", "Germany", "Canada", "Australia", "USA", "Sweden"];
     const results = await Promise.allSettled(
       countries.map((c) => getUniversities({ country: c, per_page: 1 })),
@@ -202,6 +211,7 @@ function Home() {
       }
     });
     setDestCounts(counts);
+    sessionStorage.setItem("fe_dest_counts", JSON.stringify(counts));
   }, []);
 
   useEffect(() => {
