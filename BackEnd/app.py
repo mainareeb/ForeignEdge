@@ -767,78 +767,65 @@ def get_news():
     RSS_FEEDS = TOPIC_FEEDS.get(topic, TOPIC_FEEDS["scholarships"])
     keywords  = TOPIC_KEYWORDS.get(topic, TOPIC_KEYWORDS["scholarships"])
 
-    articles = []
-    headers = {"User-Agent": "Mozilla/5.0 ForeignEdge/3.0"}
+    import re
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    seen_titles = set()
-    for source_name, feed_url in RSS_FEEDS:
-        if len(articles) >= 9:
-            break
+    h = {"User-Agent": "Mozilla/5.0 ForeignEdge/3.0"}
+
+    def fetch_feed(source_name, feed_url):
+        """Fetch and parse one RSS feed, return matching articles list."""
+        feed_articles = []
         try:
-            r = req.get(feed_url, headers=headers, timeout=8)
+            r = req.get(feed_url, headers=h, timeout=6)
             if r.status_code != 200:
-                continue
+                return feed_articles
             root = ET.fromstring(r.content)
-            ns = {"media": "http://search.yahoo.com/mrss/",
-                  "dc":    "http://purl.org/dc/elements/1.1/"}
-
-            # Handle both RSS <channel><item> and Atom <entry>
+            ns = {"media": "http://search.yahoo.com/mrss/"}
             items = root.findall(".//item") or root.findall(".//{http://www.w3.org/2005/Atom}entry")
-
             for item in items:
-                title = (item.findtext("title") or
-                         item.findtext("{http://www.w3.org/2005/Atom}title") or "").strip()
-                desc  = (item.findtext("description") or
-                         item.findtext("{http://www.w3.org/2005/Atom}summary") or "").strip()
-                url   = (item.findtext("link") or
-                         item.findtext("{http://www.w3.org/2005/Atom}link") or "").strip()
-                pub   = (item.findtext("pubDate") or
-                         item.findtext("{http://www.w3.org/2005/Atom}updated") or "").strip()
-
-                # Get image from media:thumbnail or enclosure
+                title = (item.findtext("title") or item.findtext("{http://www.w3.org/2005/Atom}title") or "").strip()
+                desc  = (item.findtext("description") or item.findtext("{http://www.w3.org/2005/Atom}summary") or "").strip()
+                url   = (item.findtext("link") or item.findtext("{http://www.w3.org/2005/Atom}link") or "").strip()
+                pub   = (item.findtext("pubDate") or item.findtext("{http://www.w3.org/2005/Atom}updated") or "").strip()
                 image = ""
-                media_thumb = item.find("media:thumbnail", ns)
-                if media_thumb is not None:
-                    image = media_thumb.get("url", "")
+                mt = item.find("media:thumbnail", ns)
+                if mt is not None: image = mt.get("url", "")
                 if not image:
-                    enclosure = item.find("enclosure")
-                    if enclosure is not None and "image" in enclosure.get("type", ""):
-                        image = enclosure.get("url", "")
-
-                # Clean description (strip HTML tags)
-                import re
+                    enc = item.find("enclosure")
+                    if enc is not None and "image" in enc.get("type", ""): image = enc.get("url", "")
                 desc_clean = re.sub(r"<[^>]+>", "", desc)[:200].strip()
-
-                # Normalise publish date
                 pub_iso = ""
                 if pub:
-                    try:
-                        pub_iso = parsedate_to_datetime(pub).isoformat()
-                    except Exception:
-                        pub_iso = pub
-
-                # Filter by topic keywords (case-insensitive)
+                    try: pub_iso = parsedate_to_datetime(pub).isoformat()
+                    except Exception: pub_iso = pub
                 text = (title + " " + desc_clean).lower()
-                if not any(kw in text for kw in keywords):
-                    continue
-
-                title_key = title.lower()[:60]
-                if title and url and "[Removed]" not in title and title_key not in seen_titles:
-                    seen_titles.add(title_key)
-                    articles.append({
-                        "title":        title,
-                        "description":  desc_clean,
-                        "url":          url,
-                        "image":        image,
-                        "source":       source_name,
-                        "published_at": pub_iso,
-                        "author":       source_name,
+                if any(kw in text for kw in keywords) and title and url and "[Removed]" not in title:
+                    feed_articles.append({
+                        "title": title, "description": desc_clean, "url": url,
+                        "image": image, "source": source_name,
+                        "published_at": pub_iso, "author": source_name,
                     })
-                if len(articles) >= 9:
-                    break
-        except Exception as feed_err:
-            logger.warning("RSS feed error (%s): %s", source_name, feed_err)
-            continue
+        except Exception as e:
+            logger.warning("RSS feed error (%s): %s", source_name, e)
+        return feed_articles
+
+    # Fetch ALL feeds in PARALLEL — total time = slowest single feed, not sum
+    all_articles = []
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        futures = {pool.submit(fetch_feed, name, url): name for name, url in RSS_FEEDS}
+        for future in as_completed(futures):
+            all_articles.extend(future.result())
+
+    # Deduplicate by title and trim to 9
+    seen_titles = set()
+    articles = []
+    for a in sorted(all_articles, key=lambda x: x.get("published_at",""), reverse=True):
+        key = a["title"].lower()[:60]
+        if key not in seen_titles:
+            seen_titles.add(key)
+            articles.append(a)
+        if len(articles) >= 9:
+            break
 
     # If RSS gave too few results, try NewsAPI as bonus
     if len(articles) < 3:
@@ -1057,5 +1044,21 @@ def country_info_endpoint():
     except Exception as e:
         return jsonify({"error": "Country info unavailable.", "details": str(e)}), 500
 
+def _prewarm_cache():
+    """Pre-warm slow endpoints on startup so first user gets fast response."""
+    import threading
+    def warm():
+        import time
+        time.sleep(3)  # wait for app to fully start
+        try:
+            from scrapers.engine import scrape_universities, get_exchange_rates
+            scrape_universities()
+            get_exchange_rates()
+            logger.info("Cache pre-warmed: universities + exchange rates")
+        except Exception as e:
+            logger.warning("Cache pre-warm failed: %s", e)
+    threading.Thread(target=warm, daemon=True).start()
+
 if __name__ == "__main__":
-    app.run(debug=False, port=5000)
+    _prewarm_cache()
+    app.run(debug=False, port=int(os.getenv("PORT", 5000)), threaded=True)
