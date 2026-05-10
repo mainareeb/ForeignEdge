@@ -185,14 +185,15 @@ def universities():
 @limiter.limit("30 per minute")
 def scholarships():
     """Firestore scholarships seeded from official program sites. Cross-links to universities/visa/accommodation."""
-    country = request.args.get("country","").strip() or None
-    search  = request.args.get("search","").strip() or None
-    field   = request.args.get("field","").strip() or None
-    type_   = request.args.get("type","").strip() or None
-    sort_by = request.args.get("sort","deadline")
-    limit   = min(int(request.args.get("limit",20)), 100)
+    country  = request.args.get("country","").strip() or None
+    search   = request.args.get("search","").strip() or None
+    field    = request.args.get("field","").strip() or None
+    type_    = request.args.get("type","").strip() or None
+    sort_by  = request.args.get("sort","deadline")
+    limit    = min(int(request.args.get("limit",20)), 100)
+    page     = max(1, int(request.args.get("page",1)))
     try:
-        result = get_scholarships_from_db(db, country=country, search=search, field=field, type_=type_, sort_by=sort_by, limit=limit)
+        result = get_scholarships_from_db(db, country=country, search=search, field=field, type_=type_, sort_by=sort_by, limit=limit, page=page)
         return jsonify(result), 200
     except Exception as e:
         logger.error("Scholarships error: %s", e)
@@ -702,27 +703,74 @@ def get_news():
         return jsonify(cached), 200
 
     # Real RSS feeds — education, scholarships, study abroad news
-    RSS_FEEDS = [
-        ("The Guardian",       "https://www.theguardian.com/education/rss"),
-        ("BBC Education",      "https://feeds.bbci.co.uk/news/education/rss.xml"),
-        ("Study International","https://www.studyinternational.com/feed/"),
-        ("Al Jazeera",         "https://www.aljazeera.com/xml/rss/all.xml"),
-        ("Times Higher Ed",    "https://www.timeshighereducation.com/rss.xml"),
-    ]
-
-    # Topic → keywords for filtering
-    TOPIC_KEYWORDS = {
-        "scholarships":  ["scholarship", "fellowship", "grant", "funding", "award", "bursary"],
-        "universities":  ["university", "college", "campus", "degree", "admission", "enrollment"],
-        "study abroad":  ["study abroad", "international student", "overseas", "foreign student"],
-        "accommodation": ["accommodation", "housing", "rent", "student housing", "dormitory", "hostel"],
-        "visa":          ["visa", "immigration", "student visa", "permit", "work permit"],
+    # Topic-specific RSS feeds — each topic has its own dedicated sources
+    TOPIC_FEEDS = {
+        "scholarships": [
+            ("Study International",   "https://www.studyinternational.com/feed/"),
+            ("The Guardian Education", "https://www.theguardian.com/education/rss"),
+            ("Times Higher Ed",        "https://www.timeshighereducation.com/rss.xml"),
+            ("BBC Education",          "https://feeds.bbci.co.uk/news/education/rss.xml"),
+            ("ScholarshipsAds",        "https://www.scholars4dev.com/feed/"),
+        ],
+        "universities": [
+            ("Times Higher Ed",        "https://www.timeshighereducation.com/rss.xml"),
+            ("The Guardian Education", "https://www.theguardian.com/education/rss"),
+            ("Study International",   "https://www.studyinternational.com/feed/"),
+            ("BBC Education",          "https://feeds.bbci.co.uk/news/education/rss.xml"),
+            ("Al Jazeera",             "https://www.aljazeera.com/xml/rss/all.xml"),
+        ],
+        "study abroad": [
+            ("Study International",   "https://www.studyinternational.com/feed/"),
+            ("The Guardian Education", "https://www.theguardian.com/education/rss"),
+            ("Times Higher Ed",        "https://www.timeshighereducation.com/rss.xml"),
+            ("Al Jazeera",             "https://www.aljazeera.com/xml/rss/all.xml"),
+            ("BBC Education",          "https://feeds.bbci.co.uk/news/education/rss.xml"),
+        ],
+        "accommodation": [
+            ("The Guardian",           "https://www.theguardian.com/money/rss"),
+            ("BBC News",               "https://feeds.bbci.co.uk/news/rss.xml"),
+            ("Study International",   "https://www.studyinternational.com/feed/"),
+            ("The Guardian Education", "https://www.theguardian.com/education/rss"),
+            ("Times Higher Ed",        "https://www.timeshighereducation.com/rss.xml"),
+        ],
+        "visa": [
+            ("BBC News",               "https://feeds.bbci.co.uk/news/rss.xml"),
+            ("Al Jazeera",             "https://www.aljazeera.com/xml/rss/all.xml"),
+            ("The Guardian",           "https://www.theguardian.com/uk/rss"),
+            ("Study International",   "https://www.studyinternational.com/feed/"),
+            ("BBC Education",          "https://feeds.bbci.co.uk/news/education/rss.xml"),
+        ],
     }
-    keywords = TOPIC_KEYWORDS.get(topic, ["scholarship", "study abroad", "university"])
+
+    # Wide keyword sets — more matches per feed
+    TOPIC_KEYWORDS = {
+        "scholarships":  ["scholarship", "fellowship", "grant", "funding", "award", "bursary",
+                          "fully funded", "tuition", "stipend", "financial aid", "HEC", "Chevening",
+                          "Fulbright", "DAAD", "Gates", "Rhodes", "Commonwealth"],
+        "universities":  ["university", "college", "campus", "degree", "admission", "enrollment",
+                          "undergraduate", "postgraduate", "masters", "PhD", "academic",
+                          "rankings", "faculty", "research", "graduation", "student"],
+        "study abroad":  ["study abroad", "international student", "overseas", "foreign student",
+                          "exchange program", "studying in", "study in", "international education",
+                          "global student", "Pakistani student", "higher education abroad",
+                          "student experience", "erasmus", "semester abroad"],
+        "accommodation": ["accommodation", "housing", "rent", "student housing", "dormitory",
+                           "hostel", "student flat", "cost of living", "living costs", "apartment",
+                           "halls of residence", "student room", "landlord", "tenancy",
+                           "affordable housing", "property", "rental"],
+        "visa":          ["visa", "immigration", "student visa", "permit", "work permit",
+                          "visa application", "UK visa", "US visa", "Schengen", "immigration policy",
+                          "biometric", "border", "passport", "residence permit", "home office",
+                          "visa refusal", "visa fee", "CAS", "SEVIS", "visa interview"],
+    }
+
+    RSS_FEEDS = TOPIC_FEEDS.get(topic, TOPIC_FEEDS["scholarships"])
+    keywords  = TOPIC_KEYWORDS.get(topic, TOPIC_KEYWORDS["scholarships"])
 
     articles = []
     headers = {"User-Agent": "Mozilla/5.0 ForeignEdge/3.0"}
 
+    seen_titles = set()
     for source_name, feed_url in RSS_FEEDS:
         if len(articles) >= 9:
             break
@@ -774,7 +822,9 @@ def get_news():
                 if not any(kw in text for kw in keywords):
                     continue
 
-                if title and url and "[Removed]" not in title:
+                title_key = title.lower()[:60]
+                if title and url and "[Removed]" not in title and title_key not in seen_titles:
+                    seen_titles.add(title_key)
                     articles.append({
                         "title":        title,
                         "description":  desc_clean,
@@ -790,13 +840,20 @@ def get_news():
             logger.warning("RSS feed error (%s): %s", source_name, feed_err)
             continue
 
-    # If RSS gave too few results, try NewsAPI as bonus (may work on some plans)
+    # If RSS gave too few results, try NewsAPI as bonus
     if len(articles) < 3:
         try:
             api_key = os.getenv("NEWS_API_KEY", "")
+            newsapi_q = {
+                "scholarships":  "scholarship+funding",
+                "universities":  "university+admission",
+                "study abroad":  "study+abroad+international+student",
+                "accommodation": "student+housing+rent",
+                "visa":          "student+visa+immigration",
+            }.get(topic, "scholarship")
             if api_key:
                 r2 = req.get(
-                    f"https://newsapi.org/v2/top-headlines?q=scholarship&category=education&language=en&pageSize=9&apiKey={api_key}",
+                    f"https://newsapi.org/v2/everything?q={newsapi_q}&language=en&sortBy=publishedAt&pageSize=9&apiKey={api_key}",
                     headers={"User-Agent": "ForeignEdge/1.0"}, timeout=8
                 )
                 d2 = r2.json()
@@ -1000,7 +1057,5 @@ def country_info_endpoint():
     except Exception as e:
         return jsonify({"error": "Country info unavailable.", "details": str(e)}), 500
 
-# ── FIXED: Use Railway's PORT env variable and bind to 0.0.0.0 ───────────────
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", debug=False, port=port)
+    app.run(debug=False, port=5000)
