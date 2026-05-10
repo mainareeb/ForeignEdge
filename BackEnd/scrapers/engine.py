@@ -265,6 +265,7 @@ def get_scholarships_from_db(
     type_:   str = None,
     sort_by: str = "deadline",
     limit:   int = 50,
+    page:    int = 1,
 ) -> dict:
     """
     Fetch scholarships from Firestore.
@@ -324,12 +325,15 @@ def get_scholarships_from_db(
         else:  # deadline
             data.sort(key=lambda s: (s.get("deadline", "ZZZ"), s.get("name", "")))
 
-        total = len(data)
-        data  = data[:limit]
+        total    = len(data)
+        start    = (page - 1) * limit
+        data     = data[start : start + limit]
 
         result = {
             "total":   total,
             "results": data,
+            "pages":   max(1, (total + limit - 1) // limit),
+            "page":    page,
             "filters": {"country": country, "search": search, "field": field, "type": type_},
             "data_policy": (
                 "All scholarships sourced from official program websites. "
