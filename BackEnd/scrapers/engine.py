@@ -71,7 +71,7 @@ def _cache_invalidate(prefix: str) -> None:
 
 # ── HTTP helper with retry + timeout ──────────────────────────────────────────
 def _get(url: str, params: dict = None, headers: dict = None,
-         retries: int = 3, timeout: int = 10) -> Optional[Any]:
+         retries: int = 2, timeout: int = 8) -> Optional[Any]:
     """
     GET request with exponential backoff retry.
     Returns parsed JSON or None on failure.
@@ -143,7 +143,7 @@ def _scrapdо_get(url: str, params: dict = None) -> Optional[Any]:
     scrapdо_url = f"https://api.scrapdo.io/scrape?token={api_key}&url={full_url}&render=false"
 
     try:
-        resp = requests.get(scrapdо_url, timeout=30)
+        resp = requests.get(scrapdо_url, timeout=5)
         resp.raise_for_status()
         content_type = resp.headers.get("content-type", "")
         if "json" in content_type:
