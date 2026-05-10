@@ -28,11 +28,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import {
-  getUniversities,
-  getScholarships,
-  getUserProfile,
-} from "../services/api";
+import { getUniversities, getUserProfile } from "../services/api";
 import API from "../services/api";
 
 const AppContext = createContext(null);
@@ -81,17 +77,34 @@ export function AppProvider({ children }) {
   // ─────────────────────────────────────────────────────────────────────────
   const loadUserProfile = useCallback(async () => {
     const token = localStorage.getItem("token");
-    if (!token || profileLoading) return;
+    if (!token) return;
+    // Use sessionStorage cache to avoid re-fetching on every navigation
+    const cachedProfile = sessionStorage.getItem("fe_user_profile");
+    if (cachedProfile) {
+      try {
+        setUserProfile(JSON.parse(cachedProfile));
+        setProfileLoading(false);
+        return;
+      } catch {}
+    }
     setProfileLoading(true);
     try {
       const res = await getUserProfile();
       setUserProfile(res.data);
+      sessionStorage.setItem("fe_user_profile", JSON.stringify(res.data));
     } catch {
       setUserProfile(null);
     } finally {
       setProfileLoading(false);
     }
-  }, [profileLoading]);
+  }, []); // removed profileLoading dep to prevent infinite loop
+
+  // Clear cache on logout
+  const clearProfileCache = () => {
+    sessionStorage.removeItem("fe_user_profile");
+    sessionStorage.removeItem("fe_global_stats");
+    sessionStorage.removeItem("fe_exchange_rates");
+  };
 
   useEffect(() => {
     loadUserProfile();
@@ -110,17 +123,28 @@ export function AppProvider({ children }) {
         uniRes.status === "fulfilled" ? uniRes.value.data?.total : null;
       const platStats =
         statsRes.status === "fulfilled" ? statsRes.value.data : null;
-      setGlobalStats({
+      const stats = {
         universities: uniTotal ? uniTotal : null,
         scholarships: platStats?.scholarships ? platStats.scholarships : null,
         countries: platStats?.countries ? platStats.countries : null,
-      });
+      };
+      setGlobalStats(stats);
+      sessionStorage.setItem("fe_global_stats", JSON.stringify(stats));
     } catch {
       // Non-critical — page still works without stats
     }
   }, []);
 
   useEffect(() => {
+    // Only load if not already cached in sessionStorage
+    const cached = sessionStorage.getItem("fe_global_stats");
+    if (cached) {
+      try {
+        const d = JSON.parse(cached);
+        setGlobalStats(d);
+        return;
+      } catch {}
+    }
     loadGlobalStats();
   }, []); // eslint-disable-line
 
@@ -128,9 +152,17 @@ export function AppProvider({ children }) {
   // Load exchange rates once
   // ─────────────────────────────────────────────────────────────────────────
   const loadExchangeRates = useCallback(async () => {
+    const cachedRates = sessionStorage.getItem("fe_exchange_rates");
+    if (cachedRates) {
+      try {
+        setExchangeRates(JSON.parse(cachedRates));
+        return;
+      } catch {}
+    }
     try {
       const res = await API.get("/exchange-rates?base=USD");
       setExchangeRates(res.data);
+      sessionStorage.setItem("fe_exchange_rates", JSON.stringify(res.data));
     } catch {
       // Non-critical
     }
@@ -241,6 +273,7 @@ export function AppProvider({ children }) {
     clearPrefills,
     loadUserProfile,
     loadGlobalStats,
+    clearProfileCache,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
