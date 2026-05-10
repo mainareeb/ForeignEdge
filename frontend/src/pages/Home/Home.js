@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { getUniversities, getPlatformStats } from "../../services/api";
+import API, { getUniversities, getPlatformStats } from "../../services/api";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 
@@ -209,17 +209,12 @@ function Home() {
     fetchDestCounts();
   }, [fetchLiveStats, fetchDestCounts]);
 
-  // Fetch news on tab change - using axios instance for proper error handling
+  // Fetch news on tab change - using API service for proper interceptors
   useEffect(() => {
     setNewsLoading(true);
-    const baseUrl = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
-    fetch(baseUrl + "/news?topic=" + encodeURIComponent(newsTab))
-      .then((r) => {
-        if (!r.ok) throw new Error("Network error");
-        return r.json();
-      })
-      .then((data) => {
-        setNews(data.articles || []);
+    API.get("/news", { params: { topic: newsTab } })
+      .then((res) => {
+        setNews(res.data.articles || []);
         setNewsLoading(false);
       })
       .catch(() => {
@@ -305,19 +300,19 @@ function Home() {
       step: "01",
       title: "Create Account",
       desc: "Sign up for free and complete your academic profile.",
-      icon: "️",
+      icon: "🎓",
     },
     {
       step: "02",
       title: "Get Recommendations",
       desc: "Our AI analyzes your profile and suggests best-fit universities.",
-      icon: "",
+      icon: "🤖",
     },
     {
       step: "03",
       title: "Apply & Succeed",
       desc: "Apply to universities and track your applications in one place.",
-      icon: "",
+      icon: "🏆",
     },
   ];
 
